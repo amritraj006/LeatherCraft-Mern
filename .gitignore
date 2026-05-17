@@ -1,0 +1,74 @@
+# =========================
+# OS FILES
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# LOG FILES
+# =========================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =========================
+# ENV FILES
+# =========================
+.env
+*.env
+
+# =========================
+# IDE FILES
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# NODE MODULES
+# =========================
+node_modules/
+client/node_modules/
+seller/node_modules/
+
+# =========================
+# BUILD FILES
+# =========================
+dist/
+build/
+client/dist/
+seller/dist/
+
+# =========================
+# LARAVEL BACKEND
+# =========================
+backend/vendor/
+backend/node_modules/
+
+backend/public/storage
+backend/storage/*.key
+
+backend/storage/logs/*
+backend/storage/framework/cache/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+
+backend/.env
+backend/.phpunit.result.cache
+
+# =========================
+# CACHE FILES
+# =========================
+.cache/
+*.cache
+
+# =========================
+# TEMP FILES
+# =========================
+tmp/
+temp/
+
+# =========================
+# UPLOADS
+# =========================
+uploads/
