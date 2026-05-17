@@ -7,7 +7,7 @@ Full-stack seller panel for uploading leather product images, generating AI desi
 ```text
 seller/   React + Vite + Tailwind
 backend/  Laravel API
-```//
+```
 
 ## Backend
 
