@@ -1,6 +1,21 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, ShoppingCart, Sparkles, Filter, ShieldCheck, Heart } from 'lucide-react'
+import { 
+  ArrowRight, 
+  ShoppingCart, 
+  Sparkles, 
+  Filter, 
+  ShieldCheck, 
+  Heart,
+  Store,
+  Briefcase,
+  Wallet,
+  Shirt,
+  Tag,
+  ArrowUpDown,
+  Search,
+  Grid
+} from 'lucide-react'
 import api, { getApiError } from '../api/client'
 import { useCart } from '../store/useCart'
 import { useToast } from '../store/useToast'
@@ -10,6 +25,8 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [filterCategory, setFilterCategory] = useState('All')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [sortBy, setSortBy] = useState('newest')
   const addItem = useCart(state => state.addItem)
   const addToast = useToast(state => state.addToast)
 
@@ -48,11 +65,136 @@ export default function Home() {
     fetchCatalog()
   }, [])
 
-  const categories = ['All', ...new Set(products.map(p => p.design?.product?.category || 'Leather'))]
+  // Helper for predefined categories
+  const getIcon = (name, size = 18, className = "") => {
+    switch (name) {
+      case 'Store': return <Store size={size} className={className} />;
+      case 'Briefcase': return <Briefcase size={size} className={className} />;
+      case 'Wallet': return <Wallet size={size} className={className} />;
+      case 'Shirt': return <Shirt size={size} className={className} />;
+      case 'Sparkles': return <Sparkles size={size} className={className} />;
+      default: return <Tag size={size} className={className} />;
+    }
+  };
 
-  const filteredProducts = filterCategory === 'All'
-    ? products
-    : products.filter(p => (p.design?.product?.category || 'Leather') === filterCategory)
+  // Extract raw categories from DB products
+  const rawCategories = Array.from(
+    new Set(
+      products.map((p) =>
+        (p.design?.product?.category || 'Leather').toLowerCase().trim()
+      )
+    )
+  );
+
+  const activeCategories = [];
+  
+  // Always include 'All'
+  activeCategories.push({
+    id: 'All',
+    name: 'All Curated',
+    desc: 'Browse our complete catalog of leather crafts',
+    icon: 'Store',
+    gradient: 'from-amber-600/10 via-amber-700/5 to-transparent',
+    borderColor: 'hover:border-amber-500/30',
+    rawKeys: []
+  });
+
+  const predefinedMap = {
+    'bag': { name: 'Luxury Bags', desc: 'Premium custom printed bags', icon: 'Briefcase', gradient: 'from-blue-600/10 via-blue-700/5 to-transparent', borderColor: 'hover:border-blue-500/30' },
+    'bags': { name: 'Luxury Bags', desc: 'Premium custom printed bags', icon: 'Briefcase', gradient: 'from-blue-600/10 via-blue-700/5 to-transparent', borderColor: 'hover:border-blue-500/30' },
+    'wallet': { name: 'Fine Wallets', desc: 'Minimalist cardholders & bi-folds', icon: 'Wallet', gradient: 'from-emerald-600/10 via-emerald-700/5 to-transparent', borderColor: 'hover:border-emerald-500/30' },
+    'wallets': { name: 'Fine Wallets', desc: 'Minimalist cardholders & bi-folds', icon: 'Wallet', gradient: 'from-emerald-600/10 via-emerald-700/5 to-transparent', borderColor: 'hover:border-emerald-500/30' },
+    'accessory': { name: 'Accessories', desc: 'Premium custom leather details', icon: 'Sparkles', gradient: 'from-purple-600/10 via-purple-700/5 to-transparent', borderColor: 'hover:border-purple-500/30' },
+    'accessories': { name: 'Accessories', desc: 'Premium custom leather details', icon: 'Sparkles', gradient: 'from-purple-600/10 via-purple-700/5 to-transparent', borderColor: 'hover:border-purple-500/30' },
+    'jacket': { name: 'Signature Jackets', desc: 'Curated premium leather jackets', icon: 'Shirt', gradient: 'from-rose-600/10 via-rose-700/5 to-transparent', borderColor: 'hover:border-rose-500/30' },
+    'jackets': { name: 'Signature Jackets', desc: 'Curated premium leather jackets', icon: 'Shirt', gradient: 'from-rose-600/10 via-rose-700/5 to-transparent', borderColor: 'hover:border-rose-500/30' },
+  };
+
+  const addedKeys = new Set();
+
+  rawCategories.forEach((rawCat) => {
+    const matched = predefinedMap[rawCat];
+    if (matched) {
+      const key = matched.name;
+      if (!addedKeys.has(key)) {
+        activeCategories.push({
+          id: key,
+          name: matched.name,
+          desc: matched.desc,
+          icon: matched.icon,
+          gradient: matched.gradient,
+          borderColor: matched.borderColor,
+          rawKeys: [rawCat, rawCat === 'bag' ? 'bags' : rawCat === 'wallet' ? 'wallets' : rawCat === 'accessory' ? 'accessories' : rawCat === 'jacket' ? 'jackets' : '']
+        });
+        addedKeys.add(key);
+      }
+    } else {
+      // Dynamic category from DB not in predefined list
+      const capitalized = rawCat.charAt(0).toUpperCase() + rawCat.slice(1);
+      if (!addedKeys.has(capitalized)) {
+        activeCategories.push({
+          id: capitalized,
+          name: capitalized,
+          desc: `Custom printed leather ${rawCat}`,
+          icon: 'Tag',
+          gradient: 'from-slate-600/10 via-slate-700/5 to-transparent',
+          borderColor: 'hover:border-slate-500/30',
+          rawKeys: [rawCat]
+        });
+        addedKeys.add(capitalized);
+      }
+    }
+  });
+
+  // Calculate items count helper
+  const getCategoryItemCount = (cat) => {
+    if (cat.id === 'All') return products.length;
+    return products.filter((p) => {
+      const pCat = (p.design?.product?.category || 'Leather').toLowerCase().trim();
+      return cat.rawKeys.includes(pCat);
+    }).length;
+  };
+
+  // Filter products by category & search query
+  let processedProducts = products.filter((p) => {
+    // 1. Category Filter
+    if (filterCategory !== 'All') {
+      const activeCat = activeCategories.find(c => c.id === filterCategory);
+      if (activeCat) {
+        const pCat = (p.design?.product?.category || 'Leather').toLowerCase().trim();
+        if (!activeCat.rawKeys.includes(pCat)) {
+          return false;
+        }
+      }
+    }
+
+    // 2. Search Query Filter
+    if (searchQuery.trim() !== '') {
+      const query = searchQuery.toLowerCase().trim();
+      const titleMatch = p.title?.toLowerCase().includes(query);
+      const descMatch = p.description?.toLowerCase().includes(query);
+      const sellerMatch = p.user?.name?.toLowerCase().includes(query);
+      const categoryMatch = (p.design?.product?.category || 'Leather').toLowerCase().includes(query);
+      return titleMatch || descMatch || sellerMatch || categoryMatch;
+    }
+
+    return true;
+  });
+
+  // Sort products
+  processedProducts = [...processedProducts].sort((a, b) => {
+    if (sortBy === 'price-asc') {
+      return a.price - b.price;
+    }
+    if (sortBy === 'price-desc') {
+      return b.price - a.price;
+    }
+    // Default or 'newest'
+    return new Date(b.created_at || b.id) - new Date(a.created_at || a.id);
+  });
+
+  // Calculate displayed products (max 5 on shop page curated display)
+  const displayedProducts = processedProducts.slice(0, 5);
 
   return (
     <div className="space-y-16 pb-24 animate-in fade-in duration-500">
@@ -113,35 +255,122 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Filterable Catalog Section */}
-      <section id="products" className="max-w-6xl mx-auto space-y-8 px-4">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-sand/30 pb-5">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight text-walnut">Explore Our Products</h2>
-            <p className="text-xs text-walnut/50 mt-1 font-semibold">Browse beautiful leather items printed with custom patterns.</p>
+      {/* Interactive Category Grid Section */}
+      {products.length > 0 && (
+        <section className="max-w-6xl mx-auto px-4 space-y-6">
+          <div className="text-center space-y-2">
+            <h2 className="text-xs uppercase tracking-widest font-extrabold text-terracotta">Browse Collections</h2>
+            <p className="text-2xl md:text-3xl font-serif font-black text-walnut">Select Leather Craft Category</p>
+            <div className="h-1 w-12 bg-terracotta mx-auto rounded-full mt-2"></div>
           </div>
 
-          {/* Filtering tabs */}
-          {products.length > 0 && (
-            <div className="flex flex-wrap gap-2 items-center">
-              <span className="text-[10px] uppercase font-bold text-walnut/40 tracking-wider flex items-center gap-1 mr-1">
-                <Filter size={10} /> Filter Category:
-              </span>
-              {categories.map(cat => (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 pt-4">
+            {activeCategories.map((cat) => {
+              const count = getCategoryItemCount(cat);
+              const isActive = filterCategory === cat.id;
+
+              return (
                 <button
-                  key={cat}
-                  onClick={() => setFilterCategory(cat)}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition border ${
-                    filterCategory === cat
-                      ? 'bg-walnut text-white border-walnut'
-                      : 'bg-white text-walnut/70 border-sand hover:bg-sand/15'
+                  key={cat.id}
+                  onClick={() => {
+                    setFilterCategory(cat.id);
+                    document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className={`group text-left p-5 rounded-2xl border transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[140px] shadow-sm ${
+                    isActive
+                      ? 'bg-walnut text-white border-walnut ring-2 ring-walnut/20'
+                      : `bg-white text-walnut border-sand/40 ${cat.borderColor} hover:shadow-md hover:-translate-y-1`
                   }`}
                 >
-                  {cat}
+                  {/* Subtle Background Gradient */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${cat.gradient} opacity-70`}></div>
+
+                  {/* Icon & Count Row */}
+                  <div className="relative z-10 flex items-center justify-between w-full">
+                    <div className={`p-2.5 rounded-xl border ${
+                      isActive 
+                        ? 'bg-white/10 border-white/20 text-white' 
+                        : 'bg-walnut/5 border-walnut/10 text-walnut'
+                    } transition-colors`}>
+                      {getIcon(cat.icon, 20)}
+                    </div>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                      isActive 
+                        ? 'bg-white/20 border-white/30 text-white' 
+                        : 'bg-sand/30 border-sand/40 text-walnut/70'
+                    }`}>
+                      {count} {count === 1 ? 'item' : 'items'}
+                    </span>
+                  </div>
+
+                  {/* Name and Description */}
+                  <div className="relative z-10 mt-6 space-y-1">
+                    <h3 className="font-bold text-sm tracking-tight">{cat.name}</h3>
+                    <p className={`text-[10px] line-clamp-1 ${
+                      isActive ? 'text-white/60' : 'text-walnut/50'
+                    }`}>
+                      {cat.desc}
+                    </p>
+                  </div>
+                  
+                  {/* Active Indicator Line */}
+                  {isActive && (
+                    <div className="absolute bottom-0 inset-x-0 h-1 bg-terracotta"></div>
+                  )}
                 </button>
-              ))}
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Filterable Catalog Section */}
+      <section id="products" className="max-w-6xl mx-auto space-y-8 px-4 pt-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-sand/30 pb-6">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-bold tracking-tight text-walnut">
+                {filterCategory === 'All' ? 'Curated Catalog' : filterCategory}
+              </h2>
+              <span className="text-[10px] font-extrabold uppercase bg-terracotta/10 text-terracotta border border-terracotta/25 px-2 py-0.5 rounded-full">
+                {processedProducts.length} {processedProducts.length === 1 ? 'Item' : 'Items'} Found
+              </span>
             </div>
-          )}
+            <p className="text-xs text-walnut/50 font-semibold">
+              {filterCategory === 'All' 
+                ? 'Showing all custom printed premium leather goods' 
+                : `Showing handcrafted ${filterCategory.toLowerCase()} designs from verified sellers`}
+            </p>
+          </div>
+
+          {/* Search and Sort controls */}
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full md:w-auto">
+            {/* Search Input */}
+            <div className="relative flex-1 sm:w-64">
+              <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-walnut/40" />
+              <input
+                type="text"
+                placeholder="Search products, sellers..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 text-xs font-semibold rounded-xl border border-sand bg-white text-walnut placeholder-walnut/30 focus:outline-none focus:border-terracotta focus:ring-1 focus:ring-terracotta/20 transition-all shadow-sm"
+              />
+            </div>
+
+            {/* Sort Dropdown */}
+            <div className="relative flex items-center gap-1.5 bg-white border border-sand px-3 py-2 rounded-xl shadow-sm text-xs font-bold text-walnut">
+              <ArrowUpDown size={13} className="text-walnut/50" />
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="bg-transparent border-none pr-6 pl-1 outline-none text-walnut text-xs font-semibold cursor-pointer appearance-none"
+              >
+                <option value="newest">Newest Arrivals</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         {error && (
@@ -162,11 +391,11 @@ export default function Home() {
           </div>
         ) : (
           <>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {filteredProducts.map((product) => (
+            <div className="flex flex-wrap justify-center gap-6 w-full">
+              {displayedProducts.map((product) => (
                 <div
                   key={product.id}
-                  className="group relative rounded-2xl border border-sand bg-white p-3 overflow-hidden shadow-sm hover:border-terracotta transition-all duration-300 flex flex-col justify-between"
+                  className="group relative rounded-2xl border border-sand bg-white p-3 overflow-hidden shadow-sm hover:border-terracotta transition-all duration-300 flex flex-col justify-between w-full sm:w-[260px]"
                 >
                   <span className="absolute top-5 left-5 z-10 inline-flex items-center gap-1 rounded-full bg-walnut/80 backdrop-blur-md px-2.5 py-1 text-[9px] font-semibold uppercase tracking-wider text-ivory border border-white/10">
                     {product.design?.product?.category || 'Leather'}
@@ -228,11 +457,23 @@ export default function Home() {
               ))}
             </div>
 
-            {filteredProducts.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl border border-dashed border-sand bg-white/50 max-w-xl mx-auto">
+            {processedProducts.length > 0 && (
+              <div className="flex justify-center pt-8">
+                <Link
+                  to="/products"
+                  className="inline-flex items-center gap-2 rounded-xl border border-walnut bg-white text-walnut hover:bg-walnut hover:text-white px-8 py-3.5 text-xs font-bold uppercase tracking-widest transition-all duration-300 shadow-sm"
+                >
+                  View All Product Designs
+                  <ArrowRight size={14} />
+                </Link>
+              </div>
+            )}
+
+            {processedProducts.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl border border-dashed border-sand bg-white/50 max-w-xl mx-auto w-full">
                 <Sparkles size={36} className="text-sand/80 mb-3" />
-                <p className="text-sm font-bold text-walnut">Store is empty right now.</p>
-                <p className="text-xs text-walnut/50 mt-1 font-semibold leading-relaxed">Check back later or log in as a seller to list your own products!</p>
+                <p className="text-sm font-bold text-walnut">No products match your filters.</p>
+                <p className="text-xs text-walnut/50 mt-1 font-semibold leading-relaxed">Try adjusting your search keywords or clear filters to view more items.</p>
               </div>
             )}
           </>

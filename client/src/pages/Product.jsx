@@ -42,7 +42,7 @@ export default function Product() {
     return (
       <div className="max-w-xl mx-auto mt-12 p-8 text-center rounded-2xl border border-sand bg-white shadow-sm space-y-4">
         <p className="text-sm font-bold text-rose-700">{error || 'Product not found.'}</p>
-        <Link to="/" className="inline-flex items-center gap-1.5 text-xs font-semibold text-walnut hover:underline">
+        <Link to="/shop" className="inline-flex items-center gap-1.5 text-xs font-semibold text-walnut hover:underline">
           <ArrowLeft size={14} /> Back to Catalog
         </Link>
       </div>
@@ -53,7 +53,7 @@ export default function Product() {
     <div className="max-w-6xl mx-auto space-y-8 pb-24 animate-in fade-in duration-500 mt-6 px-4">
       {/* Breadcrumbs */}
       <div>
-        <Link to="/" className="inline-flex items-center gap-1.5 text-xs font-semibold text-walnut/60 hover:text-walnut transition-colors">
+        <Link to="/shop" className="inline-flex items-center gap-1.5 text-xs font-semibold text-walnut/60 hover:text-walnut transition-colors">
           <ArrowLeft size={14} /> Back to Products
         </Link>
       </div>
@@ -133,7 +133,7 @@ export default function Product() {
                 onClick={() => {
                   addItem(product, qty)
                   addToast(`"${qty} unit(s) of ${product.title}" added to your cart!`, 'success')
-                  navigate('/')
+                  navigate('/shop')
                 }}
                 className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-walnut hover:bg-walnut/90 py-3.5 text-xs font-bold uppercase tracking-widest text-white transition-all shadow-sm"
               >

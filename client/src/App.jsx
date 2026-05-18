@@ -3,6 +3,7 @@ import { ShoppingCart, LogOut, LogIn, UserPlus, Store, Info, Phone } from 'lucid
 import { useCart } from './store/useCart'
 import { useAuth } from './store/useAuth'
 import Home from './pages/Home'
+import Products from './pages/Products'
 import Product from './pages/Product'
 import Cart from './pages/Cart'
 import Payment from './pages/Payment'
@@ -15,6 +16,7 @@ import Profile from './pages/Profile'
 import ToastContainer from './components/ToastContainer'
 import NotificationBell from './components/NotificationBell'
 import Notifications from './pages/Notifications'
+import LandingPage from './pages/LandingPage'
 
 function AppShell() {
   const itemCount = useCart(state => state.getItemCount())
@@ -28,7 +30,7 @@ function AppShell() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-sand/40 px-4 md:px-8 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           {/* Logo Brand */}
-          <Link to="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+          <Link to="/shop" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
             <div className="h-9 w-9 bg-walnut text-ivory rounded-xl flex items-center justify-center border border-sand/50 shadow-sm">
               <Store size={18} />
             </div>
@@ -40,7 +42,7 @@ function AppShell() {
 
           {/* Navigation Links */}
           <nav className="hidden sm:flex items-center gap-6 text-xs font-bold uppercase tracking-wider text-walnut/70">
-            <Link to="/" className={`hover:text-terracotta transition-colors ${location.pathname === '/' ? 'text-terracotta' : ''}`}>
+            <Link to="/shop" className={`hover:text-terracotta transition-colors ${location.pathname === '/shop' ? 'text-terracotta' : ''}`}>
               Shop Products
             </Link>
             <Link to="/about" className={`hover:text-terracotta transition-colors ${location.pathname === '/about' ? 'text-terracotta' : ''}`}>
@@ -108,7 +110,7 @@ function AppShell() {
       <footer className="bg-walnut text-ivory border-t border-sand/35 py-12 px-6">
         <div className="max-w-6xl mx-auto grid gap-8 sm:grid-cols-3 text-xs font-semibold text-ivory/60 leading-relaxed">
           <div className="space-y-4">
-            <Link to="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity text-ivory">
+            <Link to="/shop" className="flex items-center gap-2 hover:opacity-90 transition-opacity text-ivory">
               <div className="h-8 w-8 bg-ivory text-walnut rounded-lg flex items-center justify-center border border-white/10">
                 <Store size={15} />
               </div>
@@ -122,7 +124,7 @@ function AppShell() {
           <div className="space-y-3">
             <h4 className="font-bold text-white uppercase tracking-wider">Quick Links</h4>
             <div className="flex flex-col gap-2 font-semibold">
-              <Link to="/" className="hover:text-white transition-colors">Products Catalog</Link>
+              <Link to="/shop" className="hover:text-white transition-colors">Products Catalog</Link>
               <Link to="/about" className="hover:text-white transition-colors">About LeatherCraft</Link>
               <Link to="/contact" className="hover:text-white transition-colors">Customer Support</Link>
             </div>
@@ -147,8 +149,13 @@ function AppShell() {
 export default function App() {
   return (
     <Routes>
+      {/* Distraction-free Landing Portal Gateway */}
+      <Route path="/" element={<LandingPage />} />
+
+      {/* Main E-commerce Layout Shell */}
       <Route element={<AppShell />}>
-        <Route path="/" element={<Home />} />
+        <Route path="/shop" element={<Home />} />
+        <Route path="/products" element={<Products />} />
         <Route path="/product/:id" element={<Product />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Payment />} />

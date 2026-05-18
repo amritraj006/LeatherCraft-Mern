@@ -125,7 +125,7 @@ export default function About() {
 
       {/* Action link */}
       <div className="text-center pt-4">
-        <Link to="/" className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-terracotta hover:underline">
+        <Link to="/shop" className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-terracotta hover:underline">
           Explore products <ArrowRight size={14} />
         </Link>
       </div>

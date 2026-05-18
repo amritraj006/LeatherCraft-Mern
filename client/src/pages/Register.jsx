@@ -34,7 +34,7 @@ export default function Register() {
     
     const success = await register(name, email, password, passwordConfirm)
     if (success) {
-      navigate('/')
+      navigate('/shop')
     }
   }
 

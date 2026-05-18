@@ -29,7 +29,7 @@ export default function PaymentSuccess() {
 
       <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
         <Link
-          to="/"
+          to="/shop"
           className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-walnut px-5 py-3 text-xs font-bold uppercase tracking-wider text-white hover:bg-walnut/90 transition-colors shadow-sm"
         >
           <ShoppingBag size={14} /> Back to Storefront

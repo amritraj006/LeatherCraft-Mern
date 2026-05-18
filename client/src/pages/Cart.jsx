@@ -20,7 +20,7 @@ export default function Cart() {
         </div>
         <div className="pt-2">
           <Link
-            to="/"
+            to="/shop"
             className="inline-flex items-center gap-1.5 rounded-xl bg-walnut px-5 py-3 text-xs font-bold uppercase tracking-wider text-white hover:bg-walnut/90 transition-colors shadow-sm"
           >
             Start Shopping
@@ -108,7 +108,7 @@ export default function Cart() {
           ))}
 
           <div className="flex items-center justify-between pt-2">
-            <Link to="/" className="inline-flex items-center gap-1.5 text-xs font-semibold text-walnut/60 hover:text-walnut transition-colors">
+            <Link to="/shop" className="inline-flex items-center gap-1.5 text-xs font-semibold text-walnut/60 hover:text-walnut transition-colors">
               <ArrowLeft size={14} /> Continue Shopping
             </Link>
             <button

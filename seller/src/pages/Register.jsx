@@ -36,100 +36,112 @@ export default function Register() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-8">
-      <section className="w-full max-w-xl rounded-lg border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-        <div className="flex items-center gap-3">
-          <span className="flex h-12 w-12 items-center justify-center rounded-md bg-slate-950 text-white">
-            <Scissors size={22} />
-          </span>
+    <main className="flex min-h-screen items-center justify-center bg-ivory px-4 py-12 font-sans">
+      <section className="w-full max-w-xl rounded-3xl border border-sand bg-white p-8 shadow-lg sm:p-10 animate-in fade-in zoom-in duration-500">
+        
+        {/* Header Block */}
+        <div className="flex items-center gap-3.5 border-b border-sand/20 pb-6">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-walnut text-ivory shadow-md border border-sand/50">
+            <Scissors size={20} />
+          </div>
           <div>
-            <p className="text-sm font-black uppercase tracking-normal text-teal-700">Seller registration</p>
-            <h1 className="text-2xl font-black text-slate-950">Create your account</h1>
+            <span className="text-[9px] font-extrabold uppercase tracking-widest text-terracotta bg-terracotta/10 border border-terracotta/20 px-2.5 py-0.5 rounded-full">
+              Seller Registration
+            </span>
+            <h1 className="text-2xl font-serif font-bold text-walnut mt-1.5">Create Seller Workspace</h1>
           </div>
         </div>
 
         {error && (
-          <div className="mt-5 rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">
+          <div className="mt-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-semibold text-rose-700">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <label className="block">
-            <span className="text-sm font-bold text-slate-800">Name</span>
-            <span className="mt-2 flex items-center gap-2 rounded-md border border-slate-300 px-3 py-2.5 focus-within:border-teal-600 focus-within:ring-4 focus-within:ring-teal-100">
-              <UserRound size={18} className="text-slate-400" />
+          
+          {/* Name Input */}
+          <label className="block space-y-1.5">
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-walnut/50">Full Name</span>
+            <span className="flex items-center gap-2 rounded-xl border border-sand bg-ivory/50 px-3.5 py-2.5 transition-all focus-within:border-terracotta focus-within:ring-4 focus-within:ring-terracotta/10">
+              <UserRound size={16} className="text-walnut/40" />
               <input
                 type="text"
                 value={form.name}
                 onChange={(event) => updateField('name', event.target.value)}
-                className="w-full border-0 bg-transparent text-sm font-semibold text-slate-900 outline-none"
-                placeholder="Your name"
+                className="w-full border-0 bg-transparent text-xs font-semibold text-walnut outline-none placeholder:text-walnut/30"
+                placeholder="Amrit Raj"
                 required
               />
             </span>
           </label>
 
-          <label className="block">
-            <span className="text-sm font-bold text-slate-800">Email</span>
-            <span className="mt-2 flex items-center gap-2 rounded-md border border-slate-300 px-3 py-2.5 focus-within:border-teal-600 focus-within:ring-4 focus-within:ring-teal-100">
-              <Mail size={18} className="text-slate-400" />
+          {/* Email Input */}
+          <label className="block space-y-1.5">
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-walnut/50">Email Address</span>
+            <span className="flex items-center gap-2 rounded-xl border border-sand bg-ivory/50 px-3.5 py-2.5 transition-all focus-within:border-terracotta focus-within:ring-4 focus-within:ring-terracotta/10">
+              <Mail size={16} className="text-walnut/40" />
               <input
                 type="email"
                 value={form.email}
                 onChange={(event) => updateField('email', event.target.value)}
-                className="w-full border-0 bg-transparent text-sm font-semibold text-slate-900 outline-none"
+                className="w-full border-0 bg-transparent text-xs font-semibold text-walnut outline-none placeholder:text-walnut/30"
                 placeholder="seller@example.com"
                 required
               />
             </span>
           </label>
 
+          {/* Password Blocks in Grid */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block">
-              <span className="text-sm font-bold text-slate-800">Password</span>
-              <span className="mt-2 flex items-center gap-2 rounded-md border border-slate-300 px-3 py-2.5 focus-within:border-teal-600 focus-within:ring-4 focus-within:ring-teal-100">
-                <LockKeyhole size={18} className="text-slate-400" />
+            
+            {/* Password */}
+            <label className="block space-y-1.5">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-walnut/50">Password</span>
+              <span className="flex items-center gap-2 rounded-xl border border-sand bg-ivory/50 px-3.5 py-2.5 transition-all focus-within:border-terracotta focus-within:ring-4 focus-within:ring-terracotta/10">
+                <LockKeyhole size={16} className="text-walnut/40" />
                 <input
                   type="password"
                   value={form.password}
                   onChange={(event) => updateField('password', event.target.value)}
-                  className="w-full min-w-0 border-0 bg-transparent text-sm font-semibold text-slate-900 outline-none"
-                  placeholder="Min 8 characters"
+                  className="w-full min-w-0 border-0 bg-transparent text-xs font-semibold text-walnut outline-none placeholder:text-walnut/30"
+                  placeholder="Min 8 chars"
                   required
                 />
               </span>
             </label>
 
-            <label className="block">
-              <span className="text-sm font-bold text-slate-800">Confirm</span>
-              <span className="mt-2 flex items-center gap-2 rounded-md border border-slate-300 px-3 py-2.5 focus-within:border-teal-600 focus-within:ring-4 focus-within:ring-teal-100">
-                <LockKeyhole size={18} className="text-slate-400" />
+            {/* Confirm */}
+            <label className="block space-y-1.5">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-walnut/50">Confirm Password</span>
+              <span className="flex items-center gap-2 rounded-xl border border-sand bg-ivory/50 px-3.5 py-2.5 transition-all focus-within:border-terracotta focus-within:ring-4 focus-within:ring-terracotta/10">
+                <LockKeyhole size={16} className="text-walnut/40" />
                 <input
                   type="password"
                   value={form.password_confirmation}
                   onChange={(event) => updateField('password_confirmation', event.target.value)}
-                  className="w-full min-w-0 border-0 bg-transparent text-sm font-semibold text-slate-900 outline-none"
+                  className="w-full min-w-0 border-0 bg-transparent text-xs font-semibold text-walnut outline-none placeholder:text-walnut/30"
                   placeholder="Repeat password"
                   required
                 />
               </span>
             </label>
+            
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-md bg-teal-700 px-4 py-3 text-sm font-black text-white shadow-sm transition hover:bg-teal-800 disabled:bg-slate-300"
+            className="w-full rounded-xl bg-walnut py-3.5 text-xs font-bold uppercase tracking-widest text-white shadow-sm transition hover:bg-walnut/90 disabled:opacity-50 mt-2"
           >
-            {loading ? 'Creating account...' : 'Register'}
+            {loading ? 'Creating workspace...' : 'Register Workspace'}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-slate-500">
+        <p className="mt-8 text-center text-xs text-walnut/50 font-semibold border-t border-sand/20 pt-6">
           Already have an account?{' '}
-          <Link to="/login" className="font-black text-teal-700 hover:text-teal-900">
-            Login
+          <Link to="/login" className="font-bold text-terracotta hover:underline">
+            Log In here
           </Link>
         </p>
       </section>
