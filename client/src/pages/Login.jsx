@@ -125,11 +125,17 @@ export default function Login() {
             </form>
 
             <div className="mt-8 text-center pt-6 border-t border-sand/30">
-              <p className="text-xs text-walnut/60 font-semibold">
+              <p className="text-xs text-walnut/60 font-semibold mb-2">
                 New to LeatherCraft?{' '}
                 <Link to="/register" className="font-bold text-terracotta hover:underline hover:text-orange-600 transition-colors">
                   Create an account
                 </Link>
+              </p>
+              <p className="text-[10px] text-walnut/40 font-semibold uppercase tracking-wider">
+                Partner Artisan?{' '}
+                <a href="http://localhost:5173/login" className="font-bold text-walnut/80 hover:text-walnut hover:underline transition-colors">
+                  Login as Seller
+                </a>
               </p>
             </div>
           </div>

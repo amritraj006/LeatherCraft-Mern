@@ -127,6 +127,7 @@ function AppShell() {
               <Link to="/shop" className="hover:text-white transition-colors">Products Catalog</Link>
               <Link to="/about" className="hover:text-white transition-colors">About LeatherCraft</Link>
               <Link to="/contact" className="hover:text-white transition-colors">Customer Support</Link>
+              <a href="http://localhost:5173" className="hover:text-terracotta transition-colors text-white/70">Seller Portal</a>
             </div>
           </div>
 

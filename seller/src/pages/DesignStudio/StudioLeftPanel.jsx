@@ -23,6 +23,9 @@ export default function StudioLeftPanel({ canvas, activeTool, setActiveTool, sna
     // Configure canvas drawing mode
     if (toolId === 'draw') {
       canvas.isDrawingMode = true
+      if (!canvas.freeDrawingBrush) {
+        canvas.freeDrawingBrush = new fabric.PencilBrush(canvas)
+      }
       canvas.freeDrawingBrush.width = 4
       canvas.freeDrawingBrush.color = '#4A3228'
     } else {

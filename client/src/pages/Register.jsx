@@ -183,11 +183,17 @@ export default function Register() {
             </form>
 
             <div className="mt-8 text-center pt-6 border-t border-sand/30">
-              <p className="text-xs text-walnut/60 font-semibold">
+              <p className="text-xs text-walnut/60 font-semibold mb-2">
                 Already have an account?{' '}
                 <Link to="/login" className="font-bold text-terracotta hover:underline hover:text-orange-600 transition-colors">
                   Log in instead
                 </Link>
+              </p>
+              <p className="text-[10px] text-walnut/40 font-semibold uppercase tracking-wider">
+                Want to sell your designs?{' '}
+                <a href="http://localhost:5173/register" className="font-bold text-walnut/80 hover:text-walnut hover:underline transition-colors">
+                  Signup as Seller
+                </a>
               </p>
             </div>
           </div>

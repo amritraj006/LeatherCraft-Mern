@@ -24,6 +24,7 @@ export default function DesignStudio() {
   const [activeTool, setActiveTool] = useState('select')
   const [zoom, setZoom] = useState(1)
   const [showGrid, setShowGrid] = useState(false)
+  const [revision, setRevision] = useState(0)
   const imageInputRef = useRef(null)
 
   // ── Feedback ──────────────────────────────────────────────────────────────
@@ -60,10 +61,10 @@ export default function DesignStudio() {
     })
 
     // Snap-to-grid guide lines on move (optional visual aid)
-    fc.on('selection:created', e => { setActiveObject(e.selected[0]) })
-    fc.on('selection:updated', e => { setActiveObject(e.selected[0]) })
-    fc.on('selection:cleared', () => setActiveObject(null))
-    fc.on('object:modified', () => { setActiveObject(fc.getActiveObject()); snapshot() })
+    fc.on('selection:created', e => { setActiveObject(e.selected[0]); setRevision(r => r + 1) })
+    fc.on('selection:updated', e => { setActiveObject(e.selected[0]); setRevision(r => r + 1) })
+    fc.on('selection:cleared', () => { setActiveObject(null); setRevision(r => r + 1) })
+    fc.on('object:modified', () => { setActiveObject(fc.getActiveObject()); setRevision(r => r + 1); snapshot() })
     fc.on('path:created', () => snapshot())
 
     setCanvas(fc)
@@ -161,6 +162,7 @@ export default function DesignStudio() {
     activeObject.set(props)
     canvas.renderAll()
     setActiveObject(canvas.getActiveObject())
+    setRevision(r => r + 1)
   }
 
   // ── Delete active object ──────────────────────────────────────────────────
@@ -170,6 +172,7 @@ export default function DesignStudio() {
     canvas.discardActiveObject()
     canvas.renderAll()
     setActiveObject(null)
+    setRevision(r => r + 1)
     snapshot()
   }
 
