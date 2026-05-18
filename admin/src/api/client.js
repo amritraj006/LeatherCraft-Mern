@@ -16,6 +16,20 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+// Automatically handle 401 Unauthorized responses to clear stale sessions
+api.interceptors.response.use((response) => {
+  return response
+}, (error) => {
+  if (error.response && error.response.status === 401) {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    if (window.location.pathname !== '/') {
+      window.location.href = '/'
+    }
+  }
+  return Promise.reject(error)
+})
+
 export const getApiError = (error) => {
   return error.response?.data?.message || error.message || 'Something went wrong. Please try again.'
 }
