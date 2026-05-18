@@ -1,7 +1,7 @@
-import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import { useAuth } from './context/useAuth'
-import AIDesignStudio from './pages/AIDesignStudio'
+import DesignStudio from './pages/DesignStudio/DesignStudio'
 import Dashboard from './pages/Dashboard'
 import DesignsGallery from './pages/DesignsGallery'
 import Login from './pages/Login'
@@ -13,6 +13,7 @@ import Account from './pages/Account'
 import ToastContainer from './components/ToastContainer'
 import Notifications from './pages/Notifications'
 
+/** Standard shell: sidebar + scrollable padded main area */
 function AppShell() {
   return (
     <div className="flex h-screen bg-slate-50/50 overflow-hidden relative font-sans">
@@ -27,48 +28,67 @@ function AppShell() {
   )
 }
 
+/**
+ * Studio shell: sidebar + full-height canvas area with NO padding.
+ * The design studio needs every pixel.
+ */
+function StudioShell() {
+  return (
+    <div className="flex h-screen overflow-hidden relative font-sans">
+      <ToastContainer />
+      <Sidebar />
+      <div className="flex flex-col flex-1 min-h-0 overflow-hidden pt-16 md:pt-0">
+        <Outlet />
+      </div>
+    </div>
+  )
+}
+
 function ProtectedRoute() {
   const { initializing, isAuthenticated } = useAuth()
-
   if (initializing) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 text-sm font-medium text-slate-600">
-        Loading seller workspace...
+        Loading seller workspace…
       </div>
     )
   }
-
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />
 }
 
 function GuestRoute() {
   const { initializing, isAuthenticated } = useAuth()
-
   if (initializing) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 text-sm font-medium text-slate-600">
-        Loading seller workspace...
+        Loading seller workspace…
       </div>
     )
   }
-
   return isAuthenticated ? <Navigate to="/dashboard" replace /> : <Outlet />
 }
 
 export default function App() {
   return (
     <Routes>
+      {/* Public routes */}
       <Route element={<GuestRoute />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Route>
 
+      {/* Protected routes */}
       <Route element={<ProtectedRoute />}>
+        {/* Design Studio — full-screen, no padding */}
+        <Route element={<StudioShell />}>
+          <Route path="/studio" element={<DesignStudio />} />
+        </Route>
+
+        {/* All other seller pages — standard padded layout */}
         <Route element={<AppShell />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/upload" element={<UploadProduct />} />
           <Route path="/products" element={<BaseProducts />} />
-          <Route path="/studio" element={<AIDesignStudio />} />
           <Route path="/designs" element={<DesignsGallery />} />
           <Route path="/sales" element={<Sales />} />
           <Route path="/account" element={<Account />} />
