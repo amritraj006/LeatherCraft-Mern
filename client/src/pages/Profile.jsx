@@ -40,45 +40,260 @@ export default function Profile() {
 
   const downloadReceipt = (order) => {
     const invoiceNum = `INV-${new Date(order.created_at).getFullYear()}-${order.id}`
-    const invoiceText = `=========================================
-      LEATHERCRAFT MARKETPLACE INVOICE
-=========================================
-Invoice Number:   ${invoiceNum}
-Date Issued:      ${new Date(order.created_at).toLocaleString()}
-Payment Status:   PAID (Stripe Card Billing)
-
------------------------------------------
-CUSTOMER DETAILS:
-Name:             ${user.name}
-Email:            ${user.email}
-Phone:            ${user.phone || 'N/A'}
-
------------------------------------------
-PRODUCT DESCRIPTION:
-Item:             ${order.product?.title || 'Bespoke Custom Leather Product'}
-Total Quantity:   1
-Unit Price:       ₹${order.amount}
-
------------------------------------------
-BILLING SUMMARY:
-Subtotal:         ₹${order.amount}
-Tax / GST (0%):   ₹0.00
-Platform Fees:    ₹0.00
------------------------------------------
-TOTAL AMOUNT:     ₹${order.amount}
-=========================================
-Thank you for supporting hand-crafted leathers!
-For support, contact: support@leathercraft.com
-=========================================
-`
-    const blob = new Blob([invoiceText], { type: 'text/plain;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.setAttribute('href', url)
-    link.setAttribute('download', `LeatherCraft_Invoice_${invoiceNum}.txt`)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    
+    // Create a hidden iframe
+    const iframe = document.createElement('iframe')
+    iframe.style.position = 'fixed'
+    iframe.style.right = '0'
+    iframe.style.bottom = '0'
+    iframe.style.width = '0'
+    iframe.style.height = '0'
+    iframe.style.border = 'none'
+    iframe.id = 'invoice-print-iframe'
+    
+    // Remove previous iframe if exists
+    const oldIframe = document.getElementById('invoice-print-iframe')
+    if (oldIframe) {
+      document.body.removeChild(oldIframe)
+    }
+    
+    document.body.appendChild(iframe)
+    
+    const doc = iframe.contentWindow.document
+    
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>LeatherCraft Invoice ${invoiceNum}</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+        <style>
+          body {
+            font-family: 'Inter', sans-serif;
+            color: #2D2219;
+            margin: 0;
+            padding: 40px;
+            background: #ffffff;
+            font-size: 13px;
+            line-height: 1.6;
+          }
+          .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #E5D5C5;
+            padding: 40px;
+            border-radius: 20px;
+            background: #FAFAF8;
+          }
+          .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #E5D5C5;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+          }
+          .brand-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #2D2219;
+          }
+          .brand-sub {
+            font-size: 9px;
+            font-weight: bold;
+            color: #C05A3E;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+          }
+          .invoice-title {
+            text-align: right;
+          }
+          .invoice-title h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #2D2219;
+          }
+          .invoice-title p {
+            margin: 5px 0 0 0;
+            font-size: 11px;
+            font-weight: 600;
+            color: #C05A3E;
+          }
+          .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+          }
+          .details-section h3 {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #C05A3E;
+            letter-spacing: 1px;
+            margin-top: 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #E5D5C5;
+            padding-bottom: 5px;
+          }
+          .details-section p {
+            margin: 3px 0;
+            font-weight: 600;
+          }
+          .table-container {
+            margin-bottom: 40px;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+          }
+          th {
+            background: #2D2219;
+            color: #FAFAF8;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 12px 15px;
+          }
+          td {
+            padding: 15px;
+            border-bottom: 1px solid #E5D5C5;
+            font-weight: 600;
+          }
+          .total-box {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+          }
+          .total-table {
+            width: 300px;
+          }
+          .total-table td {
+            padding: 8px 15px;
+            border: none;
+          }
+          .total-table tr.grand-total td {
+            border-top: 2px solid #2D2219;
+            font-size: 16px;
+            font-weight: 800;
+            color: #C05A3E;
+            padding-top: 15px;
+          }
+          .footer-note {
+            text-align: center;
+            font-size: 10px;
+            color: #2D2219;
+            opacity: 0.6;
+            margin-top: 50px;
+            border-top: 1px dashed #E5D5C5;
+            padding-top: 20px;
+          }
+          @media print {
+            body {
+              padding: 0;
+            }
+            .invoice-container {
+              border: none;
+              background: none;
+              padding: 0;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="invoice-container">
+          <div class="header">
+            <div>
+              <div class="brand-title">LeatherCraft</div>
+              <div class="brand-sub">Printed Leather Store</div>
+            </div>
+            <div class="invoice-title">
+              <h1>Invoice</h1>
+              <p>No: ${invoiceNum}</p>
+            </div>
+          </div>
+          
+          <div class="details-grid">
+            <div class="details-section">
+              <h3>Customer Details</h3>
+              <p><strong>Name:</strong> ${user.name}</p>
+              <p><strong>Email:</strong> ${user.email}</p>
+              <p><strong>Phone:</strong> ${user.phone || 'N/A'}</p>
+            </div>
+            <div class="details-section">
+              <h3>Order Information</h3>
+              <p><strong>Date Issued:</strong> ${new Date(order.created_at).toLocaleDateString()}</p>
+              <p><strong>Payment Status:</strong> Paid (Stripe Billing)</p>
+              <p><strong>Escrow Status:</strong> Secured</p>
+            </div>
+          </div>
+          
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Product Description</th>
+                  <th style="text-align: center;">Qty</th>
+                  <th style="text-align: right;">Unit Price</th>
+                  <th style="text-align: right;">Total Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>${order.product?.title || 'Bespoke Custom Leather Product'}</td>
+                  <td style="text-align: center;">1</td>
+                  <td style="text-align: right;">₹${order.amount}</td>
+                  <td style="text-align: right;">₹${order.amount}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="total-box">
+            <table class="total-table">
+              <tr>
+                <td>Subtotal:</td>
+                <td style="text-align: right;">₹${order.amount}</td>
+              </tr>
+              <tr>
+                <td>Tax / GST (0%):</td>
+                <td style="text-align: right;">₹0.00</td>
+              </tr>
+              <tr class="grand-total">
+                <td><strong>Grand Total:</strong></td>
+                <td style="text-align: right;"><strong>₹${order.amount}</strong></td>
+              </tr>
+            </table>
+          </div>
+          
+          <div class="footer-note">
+            Thank you for supporting hand-crafted leather artisans!<br>
+            For any queries or escrow questions, please contact support@leathercraft.com
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+    doc.open()
+    doc.write(htmlContent)
+    doc.close()
+    
+    // Wait for content to render, then invoke print to PDF dialog
+    setTimeout(() => {
+      try {
+        iframe.contentWindow.focus()
+        iframe.contentWindow.print()
+      } catch (e) {
+        console.error(e)
+      }
+    }, 500)
   }
 
   // Load orders on mount
