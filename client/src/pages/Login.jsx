@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../store/useAuth'
 import { Mail, Lock, AlertCircle, LogIn, Store, ShieldCheck, Sparkles } from 'lucide-react'
+import { getSellerPortalUrl } from '../utils/url'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -133,7 +134,7 @@ export default function Login() {
               </p>
               <p className="text-[10px] text-walnut/40 font-semibold uppercase tracking-wider">
                 Partner Artisan?{' '}
-                <a href="http://localhost:5173/login" className="font-bold text-walnut/80 hover:text-walnut hover:underline transition-colors">
+                <a href={getSellerPortalUrl('/login')} className="font-bold text-walnut/80 hover:text-walnut hover:underline transition-colors">
                   Login as Seller
                 </a>
               </p>

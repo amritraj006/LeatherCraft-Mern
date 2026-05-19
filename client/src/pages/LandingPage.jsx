@@ -1,18 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, ShoppingBag, Sparkles, ShieldCheck, Layers, Store, Users, ExternalLink } from 'lucide-react'
+import { getSellerPortalUrl } from '../utils/url'
 
 export default function LandingPage() {
-  const [sellerUrl, setSellerUrl] = useState('http://localhost:5173/register')
+  const [sellerUrl, setSellerUrl] = useState(getSellerPortalUrl('/register'))
 
   useEffect(() => {
-    // Dynamically calculate the seller port based on client's active port
-    const port = window.location.port
-    if (port === '5173') {
-      setSellerUrl(`${window.location.protocol}//${window.location.hostname}:5174/register`)
-    } else if (port === '5174') {
-      setSellerUrl(`${window.location.protocol}//${window.location.hostname}:5173/register`)
-    }
+    setSellerUrl(getSellerPortalUrl('/register'))
   }, [])
 
   return (

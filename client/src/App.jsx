@@ -13,6 +13,7 @@ import Contact from './pages/Contact'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Profile from './pages/Profile'
+import { getSellerPortalUrl } from './utils/url'
 import ToastContainer from './components/ToastContainer'
 import NotificationBell from './components/NotificationBell'
 import Notifications from './pages/Notifications'
@@ -138,7 +139,7 @@ function AppShell() {
               <Link to="/shop" className="hover:text-white transition-colors">Products Catalog</Link>
               <Link to="/about" className="hover:text-white transition-colors">About LeatherCraft</Link>
               <Link to="/contact" className="hover:text-white transition-colors">Customer Support</Link>
-              <a href="http://localhost:5173" className="hover:text-terracotta transition-colors text-white/70">Seller Portal</a>
+              <a href={getSellerPortalUrl('')} className="hover:text-terracotta transition-colors text-white/70">Seller Portal</a>
             </div>
           </div>
 

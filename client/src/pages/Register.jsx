@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../store/useAuth'
 import { User, Mail, Lock, AlertCircle, UserPlus, Store, Heart, Truck } from 'lucide-react'
+import { getSellerPortalUrl } from '../utils/url'
 
 export default function Register() {
   const [name, setName] = useState('')
@@ -191,7 +192,7 @@ export default function Register() {
               </p>
               <p className="text-[10px] text-walnut/40 font-semibold uppercase tracking-wider">
                 Want to sell your designs?{' '}
-                <a href="http://localhost:5173/register" className="font-bold text-walnut/80 hover:text-walnut hover:underline transition-colors">
+                <a href={getSellerPortalUrl('/register')} className="font-bold text-walnut/80 hover:text-walnut hover:underline transition-colors">
                   Signup as Seller
                 </a>
               </p>
