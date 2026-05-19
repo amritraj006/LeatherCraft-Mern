@@ -1,250 +1,365 @@
 # 👜 LeatherCraft — Premium Custom Leather Marketplace
 
-> A state-of-the-art, end-to-end custom leather goods platform. Artisans and sellers upload high-quality leather product templates, design bespoke overlays in a canvas-based **Design Studio**, and list products for sale. Customers can shop from a curated catalog, customize and purchase items via a secure **Stripe** checkout (supporting ₹ INR), and track their orders. A powerful **Admin Dashboard** governs listing approvals, inventory management, and platform analytics with a built-in commission split.
+> A full-stack, end-to-end custom leather goods platform built on the **MERN stack**. Artisans upload leather product templates, design bespoke overlays in a canvas-based **Design Studio** (powered by `fabric.js`), and list products for sale. Customers shop from a curated catalog, customize and purchase items via a secure **Stripe** checkout (₹ INR), and track their orders in real time. A powerful **Admin Dashboard** governs listing approvals, platform analytics, order fulfillment, and commission management.
 
 ---
 
-## 🏗️ Monorepo Workspace Structure
-
-The workspace is organized as an elegant multi-workspace JS/TS repository:
+## 🏗️ Monorepo Structure
 
 ```text
 LeatherCraft/
-├── backend/    → Express.js API Server (Node.js + MongoDB + Mongoose + JWT + Stripe)
-├── client/     → Customer Storefront (React 19 + Vite + Tailwind CSS v3)
-├── seller/     → Seller Console & Canvas Design Studio (React 19 + Vite + Tailwind CSS v4)
-└── admin/      → Administrative Dashboard & Ledger Console (React 19 + Vite + Tailwind CSS v4)
+├── backend/    → Express.js REST API  (Node.js + MongoDB + Mongoose + JWT + Stripe + Cloudinary)
+├── client/     → Customer Storefront  (React 19 + Vite + Tailwind CSS v3)
+├── seller/     → Seller Console & Design Studio  (React 19 + Vite + Tailwind CSS v4)
+└── admin/      → Admin Dashboard & Ledger  (React 19 + Vite + Tailwind CSS v4)
 ```
+
+Each workspace is an independent Node/React project with its own `package.json`, `.env`, and `vite.config.js`.
 
 ---
 
-## ✨ Outstanding Features
+## ✨ Feature Overview
 
-### 🛍️ Customer Storefront (`client`)
-* **Curated Marketplace**: Browse luxury, admin-approved custom leather listings.
-* **Rich Product Presentation**: Full product detail views highlighting artisan profiles, custom design layouts, and secure Indian Rupee (₹ INR) pricing.
-* **Modern Cart & Multi-Item Checkout**: Unified cart flow and seamless Stripe PaymentIntents processing.
-* **Artisan Connect**: Direct viewing of seller profiles and their complete bespoke collection.
-* **Order History**: Personal purchase log detailing order status and real-time alerts.
+### 🛍️ Customer Storefront (`client/`)
+| Feature | Description |
+|---|---|
+| Landing Page | Hero section, featured categories, and product highlights |
+| Curated Marketplace | Browse admin-approved custom leather listings with filters & search |
+| Product Detail | Artisan profile, design preview, INR pricing, stock indicator |
+| Cart & Checkout | Multi-item cart with Stripe PaymentIntent integration |
+| Order History | Purchase log with real-time status tracking |
+| Notifications | Role-based alerts (order confirmed, shipped, delivered) |
+| User Profile | Edit name, address, and password |
+| Auth | JWT-based login & registration |
 
-### 🎨 Seller Console & Design Studio (`seller`)
-* **Artisan Hub**: Track unit sales, gross revenue, net payouts, and low-stock alerts.
-* **Premium Design Studio**: Interactive canvas builder (powered by `fabric.js`) to place artwork, adjust scale/rotation, and create beautiful custom overlays on raw leather templates (wallets, bags, notebooks, jackets).
-* **Inventory Control**: Directly publish designs for admin evaluation, monitor approved listings, and restock items.
+### 🎨 Seller Console & Design Studio (`seller/`)
+| Feature | Description |
+|---|---|
+| Dashboard | Sales KPIs, gross revenue, net payouts, low-stock alerts, charts |
+| Design Studio | Canvas builder (`fabric.js`) — place artwork, scale, rotate on leather templates |
+| AI Design | AI-assisted design generation workflow |
+| Designs Gallery | View, manage, and submit all canvas designs |
+| Base Products | Upload raw leather mockup templates to Cloudinary |
+| Marketplace Listings | Publish designs for admin review; monitor approval status |
+| Sales Ledger | Detailed earnings history per transaction |
+| Notifications | Approval/rejection alerts from the admin pipeline |
+| Account Settings | Update seller profile details |
 
-### 🛡️ Administrative Console (`admin`)
-* **Moderation Pipeline**: Review, approve, or reject seller submissions with automatic email/notification alerts.
-* **Global Sales Ledger**: Full ledger showing buyer details, seller payouts, and platform commission.
-* **Platform Health & Metrics**: Real-time sales charts and administrative income tracking (10% standard platform cut).
-* **Order Fulfillment Center**: Update shipment milestones (Confirmed ➔ Processing ➔ Shipped ➔ Delivered).
+### 🛡️ Admin Dashboard (`admin/`)
+| Feature | Description |
+|---|---|
+| Dashboard | Platform-wide metrics — total sales, revenue, commission, active sellers |
+| Moderation Pipeline | Approve or reject seller submissions with instant notifications |
+| Sellers Overview | List of all registered sellers, their listing counts, and designs |
+| Seller Designs | Browse designs per seller |
+| Sales Ledger | Full global ledger — buyer, seller, platform commission |
+| Order Fulfillment | Update shipment milestones (Confirmed → Processing → Shipped → Delivered) |
+| Notifications | Platform-wide alert management |
+
+---
+
+## 🧰 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Runtime** | Node.js ≥ 18 |
+| **API Server** | Express.js 4 |
+| **Database** | MongoDB + Mongoose 8 |
+| **Authentication** | JWT (`jsonwebtoken`) + `bcryptjs` |
+| **Payments** | Stripe (PaymentIntents API) |
+| **File Storage** | Cloudinary v2 (direct memory-stream, no temp files) |
+| **Canvas Engine** | `fabric.js` |
+| **Frontend** | React 19 + Vite |
+| **Styling** | Tailwind CSS v3 (client) / v4 (seller, admin) |
+| **Security** | `helmet`, `express-rate-limit`, `cors` |
+| **Logging** | `winston` + `morgan` |
+| **Validation** | `express-validator` |
+| **Deployment** | Render.com (via `render.yaml`) |
 
 ---
 
 ## 🚀 Getting Started
 
-### 📋 Prerequisites
-Ensure you have the following system utilities installed:
-* **Node.js** (v18.0.0 or higher) & **npm**
-* **MongoDB** (Local Community Edition or Atlas cloud database)
-* **Stripe** developer account (for processing payments)
-* **Cloudinary** account (for secure, high-performance image uploads and CDN storage)
+### Prerequisites
+- **Node.js** v18+ & npm
+- **MongoDB** — Local Community Edition or [MongoDB Atlas](https://www.mongodb.com/atlas)
+- **Stripe** developer account — [stripe.com](https://stripe.com)
+- **Cloudinary** account — [cloudinary.com](https://cloudinary.com)
 
 ---
 
-### 1. Backend API Server (`backend`)
-
-The server is powered by Express.js and MongoDB. It uses direct memory-stream uploads to Cloudinary (no local temporary uploads required) and provides atomic inventory control to prevent race conditions.
+### 1. Backend API (`backend/`)
 
 ```bash
-# Navigate to the backend directory
 cd backend
-
-# Install dependencies
 npm install
 ```
 
-Create and configure the `.env` file in `backend/`:
+Create `backend/.env`:
 
 ```env
 PORT=8000
-MONGO_URI=mongodb://127.0.0.1:27017/leathercraft_seller
+MONGO_URI=mongodb://127.0.0.1:27017/leathercraft
 
-# JWT Configuration
-JWT_SECRET=your_super_secure_jwt_secret_key_here
+# JWT
+JWT_SECRET=your_super_secure_jwt_secret_key
 JWT_TTL=1440
 
-# Stripe Payments API
+# Stripe
 STRIPE_SECRET=sk_test_...
 
-# Cloudinary Storage
+# Cloudinary
 CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
 
-# Platform Administrator Credentials (automatically seeded on first startup)
+# Admin seed credentials (auto-created on first boot)
 ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=password123
 ```
 
-Start the backend application:
-
 ```bash
-# Start in development mode with nodemon auto-reload
-npm run dev
-
-# Or start standard production server
-npm start
+npm run dev    # Development (nodemon)
+npm start      # Production
 ```
 
-> **Note:** On startup, the server automatically connects to MongoDB, sets up index mappings, and seeds the platform administrator account if it is not already present in the database.
+> **On first startup**, the server connects to MongoDB, registers all Mongoose schemas, and automatically seeds the admin account if it does not yet exist.
+
+**Health check:** `GET http://localhost:8000/` returns server status.
 
 ---
 
-### 2. Customer Storefront (`client`)
+### 2. Customer Storefront (`client/`)
 
 ```bash
 cd client
 npm install
 ```
 
-Create a `.env` file in the `client/` folder:
+Create `client/.env`:
 
 ```env
 VITE_API_BASE_URL=http://localhost:8000/api
 VITE_STRIPE_PUBLISHABLE_KEY=pk_test_...
 ```
 
-Run the customer storefront:
-
 ```bash
-npm run dev
+npm run dev   # → http://localhost:5175
 ```
-The application will launch on **http://localhost:5175**.
 
 ---
 
-### 3. Seller Console (`seller`)
+### 3. Seller Console (`seller/`)
 
 ```bash
 cd seller
 npm install
 ```
 
-Create a `.env` file in the `seller/` folder:
+Create `seller/.env`:
 
 ```env
 VITE_API_BASE_URL=http://localhost:8000/api
 ```
 
-Run the seller console:
-
 ```bash
-npm run dev
+npm run dev   # → http://localhost:5173
 ```
-The application will launch on **http://localhost:5173**.
 
 ---
 
-### 4. Admin Dashboard (`admin`)
+### 4. Admin Dashboard (`admin/`)
 
 ```bash
 cd admin
 npm install
 ```
 
-Create a `.env` file in the `admin/` folder:
+Create `admin/.env`:
 
 ```env
 VITE_API_BASE_URL=http://localhost:8000/api
 ```
 
-Run the administration suite:
-
 ```bash
-npm run dev
+npm run dev   # → http://localhost:5174
 ```
-The dashboard will launch on **http://localhost:5174**.
 
-**Default Admin Credentials:**
-* **Email:** `admin@example.com` (or your configured `ADMIN_EMAIL`)
-* **Password:** `password123` (or your configured `ADMIN_PASSWORD`)
-
----
-
-## 🔌 API Route Reference
-
-All API routes are prefixed with `/api` and require a `Bearer <token>` authentication header for protected endpoints:
-
-### 🔐 Authentication
-* `POST /api/register` - Create a new user account (defaults to `seller` role)
-* `POST /api/login` - Authenticate and retrieve a JWT access token
-* `GET /api/user` - Retrieve authenticated user profile details
-* `PUT /api/user` - Update profile settings (name, address, password)
-
-### 🎨 Products & Designs (Artisan Tools)
-* `POST /api/product/upload` - Upload raw leather template mockup (uses Cloudinary)
-* `GET /api/products` - List all raw product mockups uploaded by current seller
-* `DELETE /api/products/:id` - Delete product mockup, along with its dependent designs
-* `POST /api/design/save` - Save Canvas-overlay custom design (uploaded to Cloudinary)
-* `GET /api/designs` - List all custom designs crafted by the seller
-* `DELETE /api/design/:id` - Delete a design and remove its media from Cloudinary
-
-### 🛒 Marketplace & Cart
-* `GET /api/public/products` - Public catalog for shoppers (only shows approved listings)
-* `GET /api/public/products/:id` - Detailed catalog entry view
-* `POST /api/marketplace/products` - Submit a design to admin for approval to list it
-* `GET /api/marketplace/products` - List seller's own active and pending listings with sale counts
-* `PUT /api/marketplace/products/:id` - Edit listing information (title, price, stock)
-
-### 💳 Orders & Stripe Payments
-* `POST /api/payments/create-intent` - Create Stripe PaymentIntent (expects billing details, returns client secret)
-* `POST /api/payments/confirm` - Confirms successful transaction, decrements inventory atomically, splits commissions, and creates order records
-* `GET /api/payments/orders` - Retrieve list of customer order history
-* `GET /api/sales` - Retrieve total artisan earnings ledger
-
-### 🛡️ Administration Management
-* `GET /api/admin/pending-products` - Retrieve all seller listings pending admin review
-* `PATCH /api/admin/products/:id/status` - Approve or reject listing (sends dynamic notifications)
-* `GET /api/admin/sellers` - Overview list of registered sellers, their listing totals, and active designs
-* `GET /api/admin/sales` - Global ledger showing platform transactions, buyers, sellers, and commission sums
-* `PATCH /api/admin/sales/:id/status` - Update fulfillment milestone status and alert client/seller
-
-### 🔔 Notifications Center
-* `GET /api/notifications` - Retrieve list of unread alerts matching the user's role
-* `PATCH /api/notifications/:id/read` - Mark single alert as read
-* `PATCH /api/notifications/read-all` - Bulk mark all unread notifications as read
+**Default admin credentials:**
+- **Email:** `admin@example.com` (or your `ADMIN_EMAIL`)
+- **Password:** `password123` (or your `ADMIN_PASSWORD`)
 
 ---
 
-## 🎨 Luxury Brand Design System
+## 🔌 API Reference
 
-To capture a premium leathercraft brand identity, the entire suite implements a cohesive, high-end visual palette and curated typography:
+All routes are prefixed with `/api`. Protected routes require an `Authorization: Bearer <token>` header.
 
-* **Typography**:
-  * **Headers**: `Playfair Display` (Classic, elegant serif)
-  * **Body & UI**: `Outfit` (Clean, contemporary geometric sans-serif)
-* **Custom Scrollbars & Selections**: Tailored thin walnut-tinted bars and warm highlight selections for high-end finish.
-* **Palette**:
-  * 🟫 **Walnut** (`#4A3228`): Deep primary leather tone for headers, typography, and dark sections.
-  * 🟧 **Terracotta** (`#C96A3D`): Warm, vibrant clay orange for key CTAs, interactive states, and active items.
-  * 🌾 **Sand** (`#D8C3A5`): Soft, luxurious beige border trim and subtle divider lines.
-  * 🟩 **Olive** (`#66734F`): Rich organic green for success alerts, stock confirmations, and earnings stats.
-  * 🍦 **Ivory** (`#FAF7F2`): A luminous canvas background tone mimicking fresh cream/parchment.
+### 🔐 Auth
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/register` | ❌ | Create new account (default role: `seller`) |
+| `POST` | `/login` | ❌ | Authenticate and return JWT |
+| `GET` | `/user` | ✅ | Get authenticated user profile |
+| `PUT` | `/user` | ✅ | Update profile (name, address, password) |
+
+### 🎨 Products & Designs
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/product/upload` | ✅ | Upload raw leather template to Cloudinary |
+| `GET` | `/products` | ✅ | List seller's own raw product mockups |
+| `DELETE` | `/products/:id` | ✅ | Delete mockup and cascade-delete its designs |
+| `POST` | `/design/save` | ✅ | Save canvas design overlay (uploaded to Cloudinary) |
+| `GET` | `/designs` | ✅ | List all designs by the authenticated seller |
+| `DELETE` | `/design/:id` | ✅ | Delete design and remove Cloudinary media |
+
+### 🛒 Marketplace & Catalog
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/public/products` | ❌ | Public catalog (approved listings only) |
+| `GET` | `/public/products/:id` | ❌ | Single product detail |
+| `POST` | `/marketplace/products` | ✅ | Submit design for admin approval |
+| `GET` | `/marketplace/products` | ✅ | Seller's own listings with sale counts |
+| `PUT` | `/marketplace/products/:id` | ✅ | Edit listing (title, price, stock) |
+
+### 💳 Payments & Orders
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/payments/create-intent` | ✅ | Create Stripe PaymentIntent; returns `client_secret` |
+| `POST` | `/payments/confirm` | ✅ | Confirm payment — decrements stock atomically, splits commissions, creates order records |
+| `GET` | `/payments/orders` | ✅ | Customer order history |
+| `GET` | `/sales` | ✅ | Seller earnings ledger |
+
+### 🛡️ Admin
+| Method | Endpoint | Auth (admin) | Description |
+|---|---|---|---|
+| `GET` | `/admin/pending-products` | ✅ | All listings pending review |
+| `PATCH` | `/admin/products/:id/status` | ✅ | Approve or reject; sends notification |
+| `GET` | `/admin/sellers` | ✅ | All sellers with listing & design counts |
+| `GET` | `/admin/sales` | ✅ | Global sales ledger with commission breakdown |
+| `PATCH` | `/admin/sales/:id/status` | ✅ | Update fulfillment status; notifies buyer & seller |
+
+### 🔔 Notifications
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/notifications` | ✅ | Fetch unread alerts for current user's role |
+| `PATCH` | `/notifications/:id/read` | ✅ | Mark single notification as read |
+| `PATCH` | `/notifications/read-all` | ✅ | Bulk mark all as read |
 
 ---
 
-## 🧪 Quality and Verification Commands
+## 🗄️ Data Models
+
+| Model | Key Fields |
+|---|---|
+| `User` | `name`, `email`, `password` (bcrypt), `role` (`seller`/`admin`/`customer`) |
+| `Product` | `seller`, `imageUrl`, `cloudinaryId`, `category` |
+| `Design` | `seller`, `product`, `canvasJSON`, `previewUrl`, `cloudinaryId` |
+| `ListedProduct` | `design`, `seller`, `title`, `price`, `stock`, `status` (`pending`/`approved`/`rejected`) |
+| `Sale` | `buyer`, `seller`, `listedProduct`, `amount`, `commission`, `status`, `stripePaymentId` |
+| `Notification` | `recipient`, `role`, `type`, `message`, `is_read` |
+
+---
+
+## ☁️ Deployment (Render)
+
+The project ships with a `render.yaml` for one-click multi-service deployment on [Render.com](https://render.com).
+
+```yaml
+# Services defined in render.yaml:
+- leathercraft-backend   → Node.js Web Service
+- leathercraft-client    → Static Site (Vite build)
+- leathercraft-seller    → Static Site (Vite build)
+- leathercraft-admin     → Static Site (Vite build)
+```
+
+**Environment variables to set manually in the Render dashboard:**
+- `MONGO_URI` — your MongoDB Atlas connection string
+- `CLOUDINARY_URL` — your Cloudinary credentials
+- `STRIPE_SECRET` — your Stripe secret key
+- `JWT_SECRET` — auto-generated by Render
+- `ADMIN_EMAIL` / `ADMIN_PASSWORD` — admin seed credentials
+
+Frontend services automatically inherit the backend's `RENDER_EXTERNAL_URL` as `VITE_API_BASE_URL`.
+
+---
+
+## 🎨 Design System
+
+A cohesive luxury leather brand identity is applied across all four apps:
+
+### Typography
+| Role | Font |
+|---|---|
+| Display / Headers | [Playfair Display](https://fonts.google.com/specimen/Playfair+Display) — classic serif |
+| Body / UI | [Outfit](https://fonts.google.com/specimen/Outfit) — geometric sans-serif |
+
+### Color Palette
+| Token | Hex | Usage |
+|---|---|---|
+| 🟫 **Walnut** | `#4A3228` | Primary text, dark sections, headers |
+| 🟧 **Terracotta** | `#C96A3D` | CTAs, active states, interactive accents |
+| 🌾 **Sand** | `#D8C3A5` | Borders, dividers, subtle backgrounds |
+| 🟩 **Olive** | `#66734F` | Success, stock indicators, earnings stats |
+| 🍦 **Ivory** | `#FAF7F2` | Page backgrounds — parchment tone |
+
+---
+
+## 🧪 Verification Commands
 
 ```bash
-# Verify Backend Server is operating
+# Backend health check
 cd backend && npm run dev
 
-# Lint and verify production build configurations
+# Lint & production build validation
 cd client && npm run lint && npm run build
 cd seller && npm run lint && npm run build
-cd admin && npm run lint && npm run build
+cd admin  && npm run lint && npm run build
+```
+
+---
+
+## 📁 Project Layout (Detailed)
+
+```text
+LeatherCraft/
+├── backend/
+│   ├── config/         → MongoDB connection
+│   ├── controllers/    → Auth, products, designs, marketplace, payments, admin, notifications
+│   ├── middleware/     → JWT auth guard, role check, multer upload
+│   ├── models/         → User, Product, Design, ListedProduct, Sale, Notification
+│   ├── routes/         → auth, products, designs, marketplace, payments, admin, notifications
+│   ├── utils/          → Cloudinary helpers, response utilities
+│   └── server.js       → Express app entry point + admin seeding
+│
+├── client/src/
+│   ├── api/            → Axios client
+│   ├── components/     → Navbar, Footer, CartDrawer, shared UI
+│   ├── pages/          → LandingPage, Products, Product, Cart, Login, Register,
+│   │                     Profile, Notifications, PaymentSuccess
+│   ├── store/          → Zustand state (cart, auth, notifications)
+│   └── utils/
+│
+├── seller/src/
+│   ├── api/            → Axios client
+│   ├── components/     → Layout, Sidebar, shared UI
+│   ├── context/        → Auth context
+│   ├── pages/          → Dashboard, DesignStudio, AIDesign, DesignsGallery,
+│   │                     BaseProducts, Sales, Notifications, Account, Login, Register
+│   └── store/
+│
+├── admin/src/
+│   ├── api/            → Axios client
+│   ├── components/     → Layout, Sidebar, shared UI
+│   ├── pages/          → Dashboard, Products, Sellers, SellerDesigns,
+│   │                     Notifications, Login
+│   └── store/
+│
+├── render.yaml         → Render.com multi-service deployment config
+└── .gitignore
 ```
 
 ---
 
 ## 📜 License
-Distributable under the **MIT License**. Created with excellence for luxury leather custom e-commerce demonstration.
-# LeatherCraft-Mern
+
+Distributed under the **MIT License**.  
+Built with ❤️ for luxury leather custom e-commerce.
