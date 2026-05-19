@@ -34,6 +34,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['admin', 'seller', 'user'],
     default: 'seller'
+  },
+  avatar_url: {
+    type: String,
+    default: null
   }
 }, schemaOptions);
 

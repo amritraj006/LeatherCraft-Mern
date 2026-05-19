@@ -68,5 +68,10 @@ export const useAuth = create((set, get) => ({
     localStorage.removeItem('customer_user')
     localStorage.removeItem('customer_token')
     set({ user: null, token: '' })
+  },
+
+  setUser: (user) => {
+    localStorage.setItem('customer_user', JSON.stringify(user))
+    set({ user })
   }
 }))

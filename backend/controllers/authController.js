@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { uploadToCloudinary, deleteFromCloudinary } = require('../config/cloudinary');
 
 // Helper to issue JWT token mimicking Laravel JwtService
 const issueToken = (user) => {
@@ -25,7 +26,8 @@ const serializeUser = (user) => {
     email: user.email,
     phone: user.phone,
     addresses: user.addresses || [],
-    role: user.role
+    role: user.role,
+    avatar_url: user.avatar_url || null
   };
 };
 
@@ -158,9 +160,83 @@ const updateUser = async (req, res) => {
   }
 };
 
+// POST /user/avatar
+const updateAvatar = async (req, res) => {
+  try {
+    const user = req.user;
+    const file = req.file;
+
+    if (!file) {
+      return res.status(422).json({
+        message: 'Validation failed',
+        errors: { avatar: ['The avatar field is required.'] }
+      });
+    }
+
+    // Delete existing avatar from Cloudinary if it exists
+    if (user.avatar_url) {
+      try {
+        await deleteFromCloudinary(user.avatar_url);
+      } catch (deleteError) {
+        console.error('Failed to delete old avatar from Cloudinary:', deleteError);
+      }
+    }
+
+    // Upload to Cloudinary under folder "avatars"
+    let uploadResult;
+    try {
+      uploadResult = await uploadToCloudinary(file.buffer, 'avatars');
+    } catch (uploadError) {
+      console.error('Cloudinary avatar upload failed:', uploadError);
+      return res.status(502).json({
+        message: 'Image storage failed. Check Cloudinary settings.',
+        error: uploadError.message
+      });
+    }
+
+    user.avatar_url = uploadResult.secure_url;
+    await user.save();
+
+    return res.json({
+      message: 'Profile image updated successfully',
+      user: serializeUser(user)
+    });
+  } catch (error) {
+    console.error('Avatar update error:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// DELETE /user/avatar
+const deleteAvatar = async (req, res) => {
+  try {
+    const user = req.user;
+
+    if (user.avatar_url) {
+      try {
+        await deleteFromCloudinary(user.avatar_url);
+      } catch (deleteError) {
+        console.error('Failed to delete avatar from Cloudinary:', deleteError);
+      }
+      user.avatar_url = null;
+      await user.save();
+    }
+
+    return res.json({
+      message: 'Profile image removed successfully',
+      user: serializeUser(user)
+    });
+  } catch (error) {
+    console.error('Avatar deletion error:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
 module.exports = {
   register,
   login,
   getUser,
-  updateUser
+  updateUser,
+  updateAvatar,
+  deleteAvatar
 };

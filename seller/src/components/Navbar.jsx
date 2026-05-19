@@ -71,10 +71,26 @@ export default function Navbar() {
         </div>
 
         <div className="hidden items-center gap-4 md:flex">
-          <div className="text-right flex flex-col justify-center">
-            <p className="text-sm font-bold text-slate-900 leading-tight">{user?.name}</p>
-            <p className="text-[10px] font-bold text-teal-600 uppercase tracking-widest">{user?.role}</p>
-          </div>
+          {user?.avatar_url ? (
+            <div className="flex items-center gap-3">
+              <img
+                src={user.avatar_url}
+                alt="Profile"
+                className="h-9 w-9 rounded-full object-cover border border-slate-200 shadow-sm hover:ring-2 hover:ring-teal-500 transition-all cursor-pointer"
+                onClick={() => navigate('/account')}
+                title={user?.name}
+              />
+              <div className="text-left hidden lg:flex flex-col justify-center">
+                <p className="text-xs font-semibold text-slate-400 leading-none">Logged in as</p>
+                <p className="text-sm font-bold text-slate-900 leading-tight mt-0.5">{user?.name}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="text-right flex flex-col justify-center">
+              <p className="text-sm font-bold text-slate-900 leading-tight">Hello, {user?.name}</p>
+              <p className="text-[10px] font-bold text-teal-600 uppercase tracking-widest">{user?.role}</p>
+            </div>
+          )}
           <div className="h-8 w-px bg-slate-200"></div>
           <button
             type="button"

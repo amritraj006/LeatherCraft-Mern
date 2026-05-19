@@ -70,9 +70,20 @@ function AppShell() {
             {user ? (
               <div className="flex items-center gap-3 border-l border-sand/30 pl-3">
                 <NotificationBell />
-                <Link to="/profile" className="hidden md:inline text-xs font-bold text-walnut/80 hover:text-terracotta transition-colors">
-                  Hello, {user.name.split(' ')[0]}
-                </Link>
+                {user.avatar_url ? (
+                  <Link to="/profile" className="flex items-center">
+                    <img
+                      src={user.avatar_url}
+                      alt="Profile"
+                      className="h-8 w-8 rounded-full object-cover border border-sand/40 hover:ring-2 hover:ring-terracotta transition-all shadow-sm"
+                      title={user.name}
+                    />
+                  </Link>
+                ) : (
+                  <Link to="/profile" className="hidden md:inline text-xs font-bold text-walnut/80 hover:text-terracotta transition-colors">
+                    Hello, {user.name.split(' ')[0]}
+                  </Link>
+                )}
                 <button
                   onClick={logout}
                   className="p-2 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-100 flex items-center justify-center transition-colors text-[10px] font-bold uppercase tracking-wider gap-1"

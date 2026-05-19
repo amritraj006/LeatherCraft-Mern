@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../store/useAuth'
 import api from '../api/client'
-import { User, Phone, MapPin, Trash2, Plus, CheckCircle, AlertCircle, Save, ShoppingBag, Truck, PackageCheck, RefreshCw, CreditCard, Search, Download } from 'lucide-react'
+import { User, Phone, MapPin, Trash2, Plus, CheckCircle, AlertCircle, Save, ShoppingBag, Truck, PackageCheck, RefreshCw, CreditCard, Search, Download, Camera } from 'lucide-react'
 
 export default function Profile() {
-  const { user, updateProfile, loading, error } = useAuth()
+  const { user, updateProfile, loading, error, setUser } = useAuth()
   
   // Basic info state
   const [name, setName] = useState(user?.name || '')
@@ -27,6 +27,7 @@ export default function Profile() {
 
   const [message, setMessage] = useState('')
   const [localError, setLocalError] = useState('')
+  const [avatarLoading, setAvatarLoading] = useState(false)
 
   // Order search state
   const [orderSearch, setOrderSearch] = useState('')
@@ -151,6 +152,48 @@ For support, contact: support@leathercraft.com
     }
   }
 
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    setAvatarLoading(true)
+    setLocalError('')
+    setMessage('')
+
+    const formData = new FormData()
+    formData.append('avatar', file)
+
+    try {
+      const { data } = await api.post('/user/avatar', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      setMessage('Profile image updated successfully.')
+      setUser(data.user)
+    } catch (err) {
+      setLocalError(err.response?.data?.message || err.message || 'Failed to upload profile image.')
+    } finally {
+      setAvatarLoading(false)
+    }
+  }
+
+  const handleDeleteAvatar = async () => {
+    setAvatarLoading(true)
+    setLocalError('')
+    setMessage('')
+
+    try {
+      const { data } = await api.delete('/user/avatar')
+      setMessage('Profile image removed successfully.')
+      setUser(data.user)
+    } catch (err) {
+      setLocalError(err.response?.data?.message || err.message || 'Failed to remove profile image.')
+    } finally {
+      setAvatarLoading(false)
+    }
+  }
+
   if (!user) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center text-sm font-semibold text-walnut/60">
@@ -195,9 +238,35 @@ For support, contact: support@leathercraft.com
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 pb-24 animate-in fade-in duration-500 mt-6 px-4">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-walnut">Account Details</h1>
-        <p className="text-xs text-walnut/50 mt-1 font-semibold">Manage your contact information and delivery addresses.</p>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 bg-white p-6 rounded-3xl border border-sand shadow-sm relative overflow-hidden">
+        <div className="absolute top-0 right-0 h-64 w-64 bg-terracotta/5 rounded-full filter blur-3xl -z-0"></div>
+        <div className="relative group flex h-20 w-20 items-center justify-center rounded-full bg-walnut text-ivory shadow-md border border-sand/40 overflow-hidden cursor-pointer flex-shrink-0">
+          {avatarLoading ? (
+            <span className="h-6 w-6 border-2 border-ivory border-t-transparent rounded-full animate-spin"></span>
+          ) : user?.avatar_url ? (
+            <img src={user.avatar_url} alt="Profile" className="h-full w-full object-cover" />
+          ) : (
+            <User size={32} />
+          )}
+          <label className="absolute inset-0 bg-walnut/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
+            <Camera size={18} className="text-white" />
+            <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+          </label>
+        </div>
+        <div className="flex-1 relative z-10">
+          <h1 className="text-2xl font-serif font-black text-walnut tracking-tight">Account Details</h1>
+          <p className="text-xs text-walnut/50 mt-1 font-semibold">Manage your contact information and delivery addresses.</p>
+          {user?.avatar_url && (
+            <button
+              type="button"
+              onClick={handleDeleteAvatar}
+              disabled={avatarLoading}
+              className="mt-2 inline-flex items-center gap-1.5 text-[9px] font-extrabold uppercase tracking-widest text-rose-600 hover:text-rose-700 transition"
+            >
+              <Trash2 size={10} /> Remove Profile Image
+            </button>
+          )}
+        </div>
       </div>
 
       {(message || error || localError) && (

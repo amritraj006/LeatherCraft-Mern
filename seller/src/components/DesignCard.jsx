@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 export default function DesignCard({ design, onDelete, onList }) {
   const [deleting, setDeleting] = useState(false)
+  const [downloading, setDownloading] = useState(false)
 
   async function handleDelete() {
     setDeleting(true)
@@ -11,6 +12,32 @@ export default function DesignCard({ design, onDelete, onList }) {
       await onDelete(design.id)
     } finally {
       setDeleting(false)
+    }
+  }
+
+  async function handleDownload() {
+    if (downloading) return
+    setDownloading(true)
+
+    try {
+      const response = await fetch(design.ai_image, {
+        mode: 'cors'
+      })
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `leather-design-${design.id}.png`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Error downloading the image:', error)
+      // Fallback: open in new tab if CORS or other network issue occurs
+      window.open(design.ai_image, '_blank')
+    } finally {
+      setDownloading(false)
     }
   }
 
@@ -68,16 +95,19 @@ export default function DesignCard({ design, onDelete, onList }) {
           )}
 
           <div className="flex gap-2">
-            <a
-              href={design.ai_image}
-              target="_blank"
-              rel="noreferrer"
-              download={`leather-design-${design.id}.png`}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-sand bg-ivory text-walnut transition hover:border-terracotta hover:bg-terracotta/10 hover:text-terracotta"
-              title="Download Image"
+            <button
+              type="button"
+              onClick={handleDownload}
+              disabled={downloading}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-sand bg-ivory text-walnut transition hover:border-terracotta hover:bg-terracotta/10 hover:text-terracotta disabled:opacity-50"
+              title={downloading ? 'Downloading...' : 'Download Image'}
             >
-              <Download size={14} />
-            </a>
+              {downloading ? (
+                <span className="h-3 w-3 border-2 border-walnut border-t-transparent rounded-full animate-spin"></span>
+              ) : (
+                <Download size={14} />
+              )}
+            </button>
             <button
               type="button"
               onClick={handleDelete}

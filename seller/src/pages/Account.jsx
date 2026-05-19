@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { useAuth } from '../context/useAuth'
 import api from '../api/client'
-import { User, ShieldCheck } from 'lucide-react'
+import { User, ShieldCheck, Camera, Trash2 } from 'lucide-react'
 
 export default function Account() {
-  const { user } = useAuth()
+  const { user, setUser } = useAuth()
   
   const [form, setForm] = useState({
     name: user?.name || '',
@@ -14,6 +14,7 @@ export default function Account() {
   })
   
   const [loading, setLoading] = useState(false)
+  const [avatarLoading, setAvatarLoading] = useState(false)
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
 
@@ -31,6 +32,7 @@ export default function Account() {
       const { data } = await api.put('/user', form)
       setSuccess('Account details updated successfully.')
       localStorage.setItem('user', JSON.stringify(data.user))
+      setUser(data.user)
       
       // Clear passwords
       setForm(prev => ({ ...prev, password: '', password_confirmation: '' }))
@@ -41,17 +43,81 @@ export default function Account() {
     }
   }
 
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    setAvatarLoading(true)
+    setError('')
+    setSuccess('')
+
+    const formData = new FormData()
+    formData.append('avatar', file)
+
+    try {
+      const { data } = await api.post('/user/avatar', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      setSuccess('Profile image updated successfully.')
+      localStorage.setItem('user', JSON.stringify(data.user))
+      setUser(data.user)
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Failed to upload profile image.')
+    } finally {
+      setAvatarLoading(false)
+    }
+  }
+
+  const handleDeleteAvatar = async () => {
+    setAvatarLoading(true)
+    setError('')
+    setSuccess('')
+
+    try {
+      const { data } = await api.delete('/user/avatar')
+      setSuccess('Profile image removed successfully.')
+      localStorage.setItem('user', JSON.stringify(data.user))
+      setUser(data.user)
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Failed to remove profile image.')
+    } finally {
+      setAvatarLoading(false)
+    }
+  }
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-12">
       <section className="relative overflow-hidden rounded-3xl border border-sand/60 bg-white p-8 md:p-10 shadow-sm">
         <div className="absolute top-0 right-0 h-64 w-64 bg-terracotta/5 rounded-full filter blur-3xl -z-0"></div>
         <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-6">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-walnut text-ivory shadow-md border border-sand/40">
-            <User size={28} />
+          <div className="relative group flex h-20 w-20 items-center justify-center rounded-full bg-walnut text-ivory shadow-md border border-sand/40 overflow-hidden cursor-pointer flex-shrink-0">
+            {avatarLoading ? (
+              <span className="h-6 w-6 border-2 border-ivory border-t-transparent rounded-full animate-spin"></span>
+            ) : user?.avatar_url ? (
+              <img src={user.avatar_url} alt="Profile" className="h-full w-full object-cover" />
+            ) : (
+              <User size={32} />
+            )}
+            <label className="absolute inset-0 bg-walnut/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
+              <Camera size={18} className="text-white" />
+              <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+            </label>
           </div>
-          <div>
+          <div className="flex-1">
             <h1 className="text-3xl font-serif font-black text-walnut tracking-tight">Account Settings</h1>
             <p className="text-xs text-walnut/60 mt-2 font-semibold">Manage your seller profile, update your secure password, and maintain your store identity.</p>
+            {user?.avatar_url && (
+              <button
+                type="button"
+                onClick={handleDeleteAvatar}
+                disabled={avatarLoading}
+                className="mt-2 inline-flex items-center gap-1.5 text-[9px] font-extrabold uppercase tracking-widest text-rose-600 hover:text-rose-700 transition"
+              >
+                <Trash2 size={10} /> Remove Profile Image
+              </button>
+            )}
           </div>
         </div>
       </section>
