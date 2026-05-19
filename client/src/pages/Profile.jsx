@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../store/useAuth'
 import api from '../api/client'
-import { User, Phone, MapPin, Trash2, Plus, CheckCircle, AlertCircle, Save, ShoppingBag, Truck, PackageCheck, RefreshCw, CreditCard } from 'lucide-react'
+import { User, Phone, MapPin, Trash2, Plus, CheckCircle, AlertCircle, Save, ShoppingBag, Truck, PackageCheck, RefreshCw, CreditCard, Search, Download } from 'lucide-react'
 
 export default function Profile() {
   const { user, updateProfile, loading, error } = useAuth()
@@ -27,6 +27,58 @@ export default function Profile() {
 
   const [message, setMessage] = useState('')
   const [localError, setLocalError] = useState('')
+
+  // Order search state
+  const [orderSearch, setOrderSearch] = useState('')
+
+  const filteredOrders = orders.filter((order) => {
+    const idMatch = String(order.id).includes(orderSearch)
+    const titleMatch = (order.product?.title || '').toLowerCase().includes(orderSearch.toLowerCase())
+    return idMatch || titleMatch
+  })
+
+  const downloadReceipt = (order) => {
+    const invoiceNum = `INV-${new Date(order.created_at).getFullYear()}-${order.id}`
+    const invoiceText = `=========================================
+      LEATHERCRAFT MARKETPLACE INVOICE
+=========================================
+Invoice Number:   ${invoiceNum}
+Date Issued:      ${new Date(order.created_at).toLocaleString()}
+Payment Status:   PAID (Stripe Card Billing)
+
+-----------------------------------------
+CUSTOMER DETAILS:
+Name:             ${user.name}
+Email:            ${user.email}
+Phone:            ${user.phone || 'N/A'}
+
+-----------------------------------------
+PRODUCT DESCRIPTION:
+Item:             ${order.product?.title || 'Bespoke Custom Leather Product'}
+Total Quantity:   1
+Unit Price:       ₹${order.amount}
+
+-----------------------------------------
+BILLING SUMMARY:
+Subtotal:         ₹${order.amount}
+Tax / GST (0%):   ₹0.00
+Platform Fees:    ₹0.00
+-----------------------------------------
+TOTAL AMOUNT:     ₹${order.amount}
+=========================================
+Thank you for supporting hand-crafted leathers!
+For support, contact: support@leathercraft.com
+=========================================
+`
+    const blob = new Blob([invoiceText], { type: 'text/plain;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.setAttribute('href', url)
+    link.setAttribute('download', `LeatherCraft_Invoice_${invoiceNum}.txt`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   // Load orders on mount
   useEffect(() => {
@@ -354,18 +406,37 @@ export default function Profile() {
           </div>
         </div>
 
+        {/* Live Search & Filter Bar */}
+        {!ordersLoading && orders.length > 0 && (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-ivory/50 border border-sand/40 p-4 rounded-2xl shadow-sm">
+            <div className="relative w-full sm:w-72">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-walnut/40" />
+              <input
+                type="text"
+                placeholder="Search orders by ID or product title..."
+                value={orderSearch}
+                onChange={e => setOrderSearch(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 border border-sand bg-white rounded-xl text-xs font-semibold text-walnut focus:border-terracotta outline-none transition-all"
+              />
+            </div>
+            <span className="text-[10px] text-walnut/40 font-bold uppercase tracking-wider">
+              {filteredOrders.length} of {orders.length} transaction records
+            </span>
+          </div>
+        )}
+
         {ordersLoading ? (
           <div className="py-6 text-center text-xs font-semibold text-walnut/40">
             Loading active transactions...
           </div>
-        ) : orders.length === 0 ? (
+        ) : filteredOrders.length === 0 ? (
           <div className="text-center py-12 text-xs font-semibold text-walnut/40 max-w-sm mx-auto space-y-2">
             <ShoppingBag size={28} className="text-sand mx-auto" />
-            <p>No transactions or active purchase records found.</p>
+            <p>No transactions matching your search filters.</p>
           </div>
         ) : activeTab === 'orders' ? (
           <div className="space-y-4">
-            {orders.map((order) => (
+            {filteredOrders.map((order) => (
               <div
                 key={order.id}
                 className="rounded-2xl border border-sand bg-ivory/30 p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 text-xs font-semibold"
@@ -380,7 +451,7 @@ export default function Profile() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <span className="text-[9px] uppercase tracking-widest text-walnut/40">Order #{order.id}</span>
+                    <span className="text-[9px] uppercase tracking-widest text-walnut/40 font-bold">Order #{order.id}</span>
                     <h3 className="text-sm font-bold text-walnut">{order.product?.title || 'Printed Leather Item'}</h3>
                     <p className="text-[10px] text-walnut/50">Purchased on {new Date(order.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                   </div>
@@ -393,8 +464,14 @@ export default function Profile() {
                     <span className="text-sm font-black text-terracotta">₹{order.amount}</span>
                   </div>
                   
-                  <div>
+                  <div className="flex flex-col items-end gap-2">
                     {getStatusBadge(order.status)}
+                    <button
+                      onClick={() => downloadReceipt(order)}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-walnut hover:bg-walnut/90 border border-transparent px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-white shadow-sm hover:shadow transition-all cursor-pointer"
+                    >
+                      <Download size={10} className="text-sand" /> Invoice Receipt
+                    </button>
                   </div>
                 </div>
               </div>
@@ -411,10 +488,11 @@ export default function Profile() {
                   <th className="px-6 py-3.5">Amount</th>
                   <th className="px-6 py-3.5">Payment Status</th>
                   <th className="px-6 py-3.5">Transaction Date</th>
+                  <th className="px-6 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-sand/20 bg-white font-semibold">
-                {orders.map((order) => (
+                {filteredOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-sand/5 transition-colors">
                     <td className="px-6 py-4 text-walnut font-bold">
                       INV-{new Date(order.created_at).getFullYear()}-{order.id}
@@ -437,6 +515,14 @@ export default function Profile() {
                         hour: '2-digit',
                         minute: '2-digit'
                       })}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button
+                        onClick={() => downloadReceipt(order)}
+                        className="inline-flex items-center gap-1 rounded-lg bg-walnut hover:bg-walnut/90 border border-transparent px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-white shadow-sm hover:shadow transition-all cursor-pointer"
+                      >
+                        <Download size={10} className="text-sand" /> Download
+                      </button>
                     </td>
                   </tr>
                 ))}

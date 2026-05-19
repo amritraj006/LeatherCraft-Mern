@@ -1,4 +1,4 @@
-import { Images, X, Store } from 'lucide-react'
+import { Images, X, Store, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import api, { getApiError } from '../api/client'
 import DesignCard from '../components/DesignCard'
@@ -9,6 +9,9 @@ export default function DesignsGallery() {
   const [designs, setDesigns] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
 
   useEffect(() => {
     let active = true
@@ -79,11 +82,23 @@ export default function DesignsGallery() {
     }
   }
 
+  const filteredDesigns = designs.filter(design => {
+    const categoryMatch = (design.product?.category || '').toLowerCase().includes(searchTerm.toLowerCase())
+    const titleMatch = (design.listed_product?.title || '').toLowerCase().includes(searchTerm.toLowerCase())
+    const searchMatch = categoryMatch || titleMatch
+
+    const statusMatch = statusFilter === 'all' || 
+      (statusFilter === 'listed' && design.listed_product) || 
+      (statusFilter === 'unlisted' && !design.listed_product)
+
+    return searchMatch && statusMatch
+  })
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-12">
       {/* Page Header */}
       <section className="relative overflow-hidden rounded-3xl border border-sand/60 bg-white p-8 md:p-10 shadow-sm">
-        <div className="absolute top-0 right-0 h-40 w-40 bg-olive/10 rounded-full filter blur-2xl -z-0"></div>
+        <div className="absolute top-0 right-0 h-40 w-40 bg-olive/10 rounded-full filter blur-3xl -z-0"></div>
         <div className="relative z-10">
           <p className="text-[10px] font-bold uppercase tracking-widest text-olive">Design Portfolio</p>
           <h1 className="mt-2 text-3xl font-serif font-black tracking-tight text-walnut">Saved Creations</h1>
@@ -100,6 +115,32 @@ export default function DesignsGallery() {
         </div>
       )}
 
+      {/* Search & Filter bar */}
+      {!loading && designs.length > 0 && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl border border-sand/50 bg-white shadow-sm">
+          <div className="relative w-full sm:w-72">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-walnut/40" />
+            <input
+              type="text"
+              placeholder="Search by category or product title..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 border border-sand bg-ivory/30 rounded-xl text-xs font-bold text-walnut focus:bg-white focus:border-terracotta outline-none transition-all"
+            />
+          </div>
+          
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            className="px-3 py-2 border border-sand bg-ivory/30 rounded-xl text-xs font-bold uppercase tracking-wider text-walnut/70 focus:bg-white focus:border-terracotta outline-none transition-all cursor-pointer w-full sm:w-auto"
+          >
+            <option value="all">All Designs</option>
+            <option value="listed">Listed on Marketplace</option>
+            <option value="unlisted">Unlisted Drafts</option>
+          </select>
+        </div>
+      )}
+
       {loading ? (
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {[1, 2, 3].map(idx => (
@@ -110,9 +151,9 @@ export default function DesignsGallery() {
             </div>
           ))}
         </div>
-      ) : designs.length > 0 ? (
+      ) : filteredDesigns.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {designs.map((design) => (
+          {filteredDesigns.map((design) => (
             <DesignCard key={design.id} design={design} onDelete={deleteDesign} onList={openListModal} />
           ))}
         </div>
@@ -121,9 +162,9 @@ export default function DesignsGallery() {
           <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-sand/10 text-walnut/40 shadow-sm mb-4">
             <Images size={28} />
           </span>
-          <h2 className="text-xl font-serif font-bold text-walnut">No saved designs yet</h2>
+          <h2 className="text-xl font-serif font-bold text-walnut">No matching designs found</h2>
           <p className="mt-2 max-w-sm text-xs font-semibold leading-relaxed text-walnut/50">
-            Open the Design Studio, select a base material, and start creating beautiful printed overlays.
+            Try adjusting your search filters or open the Design Studio to create new custom canvas products.
           </p>
         </div>
       )}

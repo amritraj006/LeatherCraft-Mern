@@ -25,7 +25,7 @@ export default function SellerDesigns() {
   if (loading) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-200 border-t-teal-600"></div>
+        <div className="h-7 w-7 animate-spin rounded-full border-2 border-sand border-t-terracotta"></div>
       </div>
     )
   }
@@ -33,31 +33,33 @@ export default function SellerDesigns() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-12">
       {/* Navigation Header */}
-      <div className="flex items-center gap-4 bg-white border border-slate-200/60 p-6 rounded-2xl shadow-sm">
+      <div className="p-8 rounded-3xl border border-sand/40 bg-white shadow-sm relative overflow-hidden flex items-center gap-5">
+        <div className="absolute inset-0 opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/leather.png')] mix-blend-overlay pointer-events-none"></div>
         <Link
           to="/sellers"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white border border-sand hover:bg-sand/15 text-walnut transition-all shadow-sm z-10 cursor-pointer flex-shrink-0"
           title="Back to Sellers Directory"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={18} />
         </Link>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-800">Seller Designs Portfolios</h1>
-          <p className="text-xs font-semibold text-slate-400 mt-1">Explore active canvas compositions and manually edited leather craft layouts.</p>
+        <div className="relative z-10">
+          <span className="text-[10px] font-bold text-terracotta uppercase tracking-widest">Merchant portfolio</span>
+          <h1 className="text-3xl font-serif font-black text-walnut tracking-tight leading-tight">Seller Designs Portfolio</h1>
+          <p className="text-xs text-walnut/50 font-semibold mt-1">Explore active canvas compositions and custom leather craft layouts.</p>
         </div>
       </div>
 
       {/* Designs Grid */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {designs.map((design) => (
-          <div key={design.id} className="glass-card rounded-2xl overflow-hidden flex flex-col relative group bg-white border border-slate-200/80 shadow-sm">
+          <div key={design.id} className="premium-card rounded-3xl overflow-hidden flex flex-col relative group bg-white border border-sand/30 shadow-sm">
             {/* Visual design indicator badge */}
-            <span className="absolute top-3 left-3 z-10 inline-flex items-center gap-1 rounded-full bg-slate-900/80 backdrop-blur-md px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-white border border-white/10">
+            <span className="absolute top-3.5 left-3.5 z-10 inline-flex items-center gap-1 rounded-full bg-walnut/90 backdrop-blur-md px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-ivory border border-white/10 shadow-sm">
               Manual Craft
             </span>
 
             {/* Design canvas image rendering */}
-            <div className="aspect-square bg-slate-50 p-4 border-b border-slate-100 flex items-center justify-center overflow-hidden">
+            <div className="aspect-square bg-ivory/40 p-5 border-b border-sand/20 flex items-center justify-center overflow-hidden">
               <img
                 src={design.ai_image}
                 alt="Custom Canvas Design"
@@ -66,16 +68,16 @@ export default function SellerDesigns() {
             </div>
 
             {/* Content panel */}
-            <div className="p-4 flex-1 flex flex-col justify-between text-xs">
+            <div className="p-5 flex-1 flex flex-col justify-between text-xs">
               <div>
-                <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest">Base Product category</p>
-                <p className="text-sm font-semibold text-slate-700 mt-1 capitalize leading-tight group-hover:text-teal-600 transition-colors">
+                <p className="text-[9px] font-bold text-walnut/40 uppercase tracking-widest">Base Product Category</p>
+                <p className="text-sm font-serif font-black text-walnut mt-1 capitalize leading-tight group-hover:text-terracotta transition-colors">
                   {design.product?.category || 'Leather Craft'}
                 </p>
               </div>
               
-              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[10px] font-semibold text-slate-400">
-                <Calendar size={12} className="opacity-80" />
+              <div className="mt-4 pt-3 border-t border-sand/20 flex items-center gap-1.5 text-[10px] font-bold text-walnut/40 uppercase tracking-wider">
+                <Calendar size={12} className="opacity-80 text-terracotta" />
                 <span>
                   Saved {new Date(design.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
@@ -85,12 +87,12 @@ export default function SellerDesigns() {
         ))}
 
         {designs.length === 0 && (
-          <div className="col-span-full rounded-2xl border-2 border-dashed border-slate-200 p-16 text-center bg-white/30 backdrop-blur-md">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400 mx-auto mb-4">
+          <div className="col-span-full rounded-3xl border border-sand/40 p-16 text-center bg-white shadow-sm flex flex-col items-center justify-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sand/15 text-terracotta">
               <ImageIcon size={20} />
             </div>
-            <h3 className="text-sm font-semibold text-slate-800">No designs created</h3>
-            <p className="text-xs font-semibold text-slate-400 mt-1 max-w-sm mx-auto">This seller hasn't crafted any designs or custom composition layouts yet.</p>
+            <h3 className="text-sm font-bold text-walnut uppercase tracking-wider">No Designs Created</h3>
+            <p className="text-xs font-semibold text-walnut/40 max-w-sm">This seller hasn't crafted any designs or custom composition layouts yet.</p>
           </div>
         )}
       </div>

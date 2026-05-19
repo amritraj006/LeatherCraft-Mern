@@ -59,3 +59,44 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(74, 50, 40, 0.3);
 }
+
+/* Luxury visual styling helpers */
+.ambient-glow-1 {
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 60%;
+  height: 60%;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(201, 106, 61, 0.12) 0%, rgba(201, 106, 61, 0) 70%);
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-glow-2 {
+  position: absolute;
+  bottom: -20%;
+  right: -20%;
+  width: 60%;
+  height: 60%;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(74, 50, 40, 0.12) 0%, rgba(74, 50, 40, 0) 70%);
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.premium-card {
+  background: #ffffff;
+  border: 1px solid rgba(216, 195, 165, 0.3);
+  box-shadow: 0 4px 20px -2px rgba(74, 50, 40, 0.03), 0 2px 8px -1px rgba(74, 50, 40, 0.02);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.premium-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px -4px rgba(74, 50, 40, 0.06), 0 4px 16px -2px rgba(74, 50, 40, 0.03);
+  border-color: rgba(201, 106, 61, 0.4);
+}
+
