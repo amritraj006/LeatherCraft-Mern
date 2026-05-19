@@ -12,6 +12,7 @@ import Sales from './pages/Sales'
 import Account from './pages/Account'
 import ToastContainer from './components/ToastContainer'
 import Notifications from './pages/Notifications'
+import AIDesign from './pages/AIDesign'
 
 /** Standard shell: sidebar + scrollable padded main area */
 function AppShell() {
@@ -89,6 +90,7 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/upload" element={<UploadProduct />} />
           <Route path="/products" element={<BaseProducts />} />
+          <Route path="/ai-design" element={<AIDesign />} />
           <Route path="/designs" element={<DesignsGallery />} />
           <Route path="/sales" element={<Sales />} />
           <Route path="/account" element={<Account />} />

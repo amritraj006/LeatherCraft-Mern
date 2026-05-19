@@ -10,6 +10,7 @@ import {
   Scissors,
   Upload,
   WandSparkles,
+  Sparkles,
   X,
   DollarSign,
   User,
@@ -21,6 +22,7 @@ const links = [
   { to: '/upload', label: 'Upload Template', icon: Upload },
   { to: '/products', label: 'Base Materials', icon: Package },
   { to: '/studio', label: 'Design Studio', icon: WandSparkles },
+  { to: '/ai-design', label: 'AI Design', icon: Sparkles },
   { to: '/designs', label: 'Designs Gallery', icon: Images },
   { to: '/sales', label: 'Sales Records', icon: DollarSign },
   { to: '/account', label: 'My Account', icon: User },
@@ -123,9 +125,17 @@ export default function Sidebar() {
         <div className="p-4 border-t border-sand/30 flex flex-col gap-3">
           <div className="flex items-center justify-between gap-3 px-2 py-1">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sand/20 border border-sand/40 text-walnut font-semibold uppercase">
-                {user?.name?.[0] || 'S'}
-              </div>
+              {user?.avatar_url ? (
+                <img
+                  src={user.avatar_url}
+                  alt="Profile"
+                  className="h-9 w-9 rounded-xl object-cover border border-sand/40 flex-shrink-0"
+                />
+              ) : (
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sand/20 border border-sand/40 text-walnut font-semibold uppercase flex-shrink-0">
+                  {user?.name?.[0] || 'S'}
+                </div>
+              )}
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold text-walnut truncate leading-none">{user?.name}</p>
                 <p className="text-[10px] font-semibold text-terracotta uppercase tracking-widest mt-1">Merchant</p>

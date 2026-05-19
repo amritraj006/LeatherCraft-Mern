@@ -17,6 +17,9 @@ router.get('/designs', auth, designController.getDesigns);
 // POST /design/save - Upload and save a new design
 router.post('/design/save', auth, upload.single('design_image'), designController.saveDesign);
 
+// POST /design/generate-ai - Generate design using Pollinations AI
+router.post('/design/generate-ai', auth, designController.generateAIDesign);
+
 // DELETE /design/:designId - Delete design and its Cloudinary image
 router.delete('/design/:designId', auth, designController.deleteDesign);
 

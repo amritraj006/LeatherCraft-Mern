@@ -79,6 +79,84 @@ const saveDesign = async (req, res) => {
   }
 };
 
+// POST /design/generate-ai - Generate design using Pollinations AI
+const generateAIDesign = async (req, res) => {
+  try {
+    const { product_id, prompt } = req.body;
+
+    if (!product_id || !prompt) {
+      return res.status(422).json({
+        message: 'Validation failed',
+        errors: {
+          product_id: !product_id ? ['The product id field is required.'] : [],
+          prompt: !prompt ? ['The prompt field is required.'] : []
+        }
+      });
+    }
+
+    // Verify the product exists and is owned by the user
+    const product = await Product.findOne({ _id: product_id, user: req.user.id });
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found.' });
+    }
+
+    // Construct Pollinations AI url (free, high-quality, flux model, no logo)
+    const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&nologo=true&enhance=true&model=flux`;
+
+    console.log(`Generating AI design via Pollinations for prompt: "${prompt}"`);
+
+    let imageBuffer;
+    try {
+      const response = await fetch(pollinationsUrl);
+      if (!response.ok) {
+        throw new Error(`Pollinations AI responded with status ${response.status}`);
+      }
+      const arrayBuffer = await response.arrayBuffer();
+      imageBuffer = Buffer.from(arrayBuffer);
+    } catch (fetchError) {
+      console.error('Failed to fetch from Pollinations:', fetchError);
+      return res.status(502).json({
+        message: 'AI Image Generation service failed. Please try a different prompt.',
+        error: fetchError.message
+      });
+    }
+
+    // Upload buffer to Cloudinary under folder "designs"
+    let uploadResult;
+    try {
+      uploadResult = await uploadToCloudinary(imageBuffer, 'designs');
+    } catch (uploadError) {
+      console.error('Cloudinary design upload failed:', uploadError);
+      return res.status(502).json({
+        message: 'Image storage failed. Check Cloudinary settings.',
+        error: uploadError.message
+      });
+    }
+
+    // Create the Design
+    const design = new Design({
+      user: req.user.id,
+      product: product.id,
+      original_image: product.image_url,
+      ai_image: uploadResult.secure_url,
+      prompt: prompt
+    });
+
+    await design.save();
+
+    // Populate product relation
+    const populatedDesign = await Design.findById(design.id)
+      .populate('product', 'category image_url');
+
+    return res.status(201).json({
+      design: populatedDesign
+    });
+  } catch (error) {
+    console.error('Generate AI design error:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
 // DELETE /design/:designId
 const deleteDesign = async (req, res) => {
   try {
@@ -110,5 +188,6 @@ const deleteDesign = async (req, res) => {
 module.exports = {
   getDesigns,
   saveDesign,
+  generateAIDesign,
   deleteDesign
 };
